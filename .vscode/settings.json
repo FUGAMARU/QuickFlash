@@ -1,0 +1,7 @@
+{
+  "cSpell.ignoreWords": ["tauri", "pkce", "vite"],
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  }
+}
