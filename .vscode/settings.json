@@ -1,5 +1,5 @@
 {
-  "cSpell.ignoreWords": ["tauri", "pkce", "vite", "oxfmt"],
+  "cSpell.ignoreWords": ["tauri", "pkce", "vite", "oxfmt", "destyle"],
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnSave": true,
@@ -11,5 +11,5 @@
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
     "editor.formatOnSave": true
-  },
+  }
 }

@@ -1,0 +1,18 @@
+.layoutContainer {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+
+  > .sidebar {
+    flex: 3.5;
+    max-width: 450px;
+    height: 100%;
+    background-color: #fff8c7;
+  }
+
+  > .right {
+    flex: 6.5;
+    height: 100%;
+    background-color: #c7fff6;
+  }
+}

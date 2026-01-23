@@ -17,6 +17,7 @@
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2.3.4",
+    "destyle.css": "^4.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -38,6 +39,9 @@
     "eslint-plugin-react-you-might-not-need-an-effect": "^0.8.5",
     "globals": "^17.0.0",
     "oxfmt": "^0.26.0",
+    "stylelint": "^17.0.0",
+    "stylelint-config-recess-order": "^7.6.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.53.1",
     "vite": "^7.0.4",
