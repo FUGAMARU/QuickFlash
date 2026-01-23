@@ -1,0 +1,12 @@
+@import url("./variables.css");
+
+html,
+body {
+  overflow: hidden;
+  font-family: "IBM Plex Sans JP", sans-serif;
+  color: var(--color-dark);
+}
+
+span {
+  -webkit-font-smoothing: antialiased;
+}
