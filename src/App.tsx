@@ -112,7 +112,10 @@ function App() {
   return (
     <main className={styles.layoutContainer}>
       <aside className={styles.sidebar}>サイドバー</aside>
-      <div className={styles.right}>アートワーク・フォーム</div>
+      <div className={styles.right}>
+        <div className={styles.artwork}>アートワーク</div>
+        <form className={styles.form}>フォーム</form>
+      </div>
     </main>
   )
 }

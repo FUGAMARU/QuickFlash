@@ -14,5 +14,15 @@
     flex: 6.5;
     height: 100%;
     background-color: #c7fff6;
+
+    > .artwork {
+      aspect-ratio: 4 / 1;
+      width: 100%;
+      height: auto;
+      background-color: #e4c2ff;
+    }
+
+    > .form {
+    }
   }
 }
