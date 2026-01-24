@@ -5,6 +5,7 @@ import { useState } from "react"
 
 import styles from "@/App.module.css"
 import reactLogo from "@/assets/react.svg"
+import { KeywordInput } from "@/components/KeywordInput"
 
 const SPOTIFY_PKCE_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
 const SPOTIFY_PKCE_REDIRECT_URI = "http://127.0.0.1:8888/pkce"
@@ -15,6 +16,7 @@ if (!SPOTIFY_PKCE_CLIENT_ID) {
 }
 
 function App() {
+  const [searchKeyword, setSearchKeyword] = useState("")
   const [greetMsg, setGreetMsg] = useState("")
   const [name, setName] = useState("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -111,7 +113,17 @@ function App() {
 
   return (
     <main className={styles.layoutContainer}>
-      <aside className={styles.sidebar}>サイドバー</aside>
+      <aside className={styles.sidebar}>
+        <div className={styles.upper}>
+          <div>ユーザーのメアド</div>
+          <KeywordInput
+            isLoading
+            onChange={e => setSearchKeyword(e.target.value)}
+            value={searchKeyword}
+          />
+        </div>
+        <hr className={styles.divider} />
+      </aside>
       <div className={styles.right}>
         <div className={styles.artwork}>アートワーク</div>
         <form className={styles.form}>フォーム</form>

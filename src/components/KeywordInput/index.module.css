@@ -1,0 +1,37 @@
+.keywordInput {
+  width: 100%;
+  border-radius: 4px;
+  background-color: var(--color-soft-gray);
+  display: flex;
+  align-items: center;
+  padding: 8px 16px 8px 12px;
+  gap: 6px;
+
+  > .search {
+    width: 18px;
+    height: 18px;
+    color: var(--color-gray);
+  }
+
+  > .loading {
+    width: 18px;
+    height: 18px;
+    color: var(--color-gray);
+    animation: keywordInputSpin 0.8s linear infinite;
+  }
+
+  > .input {
+    flex: 1;
+    font-size: 12px;
+    color: var(--color-dark);
+    outline: 0;
+    padding-top: 1.5px; /* 目視で微調整 */
+    caret-color: var(--color-gray);
+  }
+}
+
+@keyframes keywordInputSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
