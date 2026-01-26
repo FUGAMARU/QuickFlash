@@ -6,6 +6,7 @@ import { useState } from "react"
 import styles from "@/App.module.css"
 import reactLogo from "@/assets/react.svg"
 import { KeywordInput } from "@/components/KeywordInput"
+import { UserInfoLabel } from "@/components/UserInfoLabel"
 
 const SPOTIFY_PKCE_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
 const SPOTIFY_PKCE_REDIRECT_URI = "http://127.0.0.1:8888/pkce"
@@ -115,7 +116,9 @@ function App() {
     <main className={styles.layoutContainer}>
       <aside className={styles.sidebar}>
         <div className={styles.upper}>
-          <div>ユーザーのメアド</div>
+          <div className={styles.user}>
+            <UserInfoLabel emailAddress="user@example.com" />
+          </div>
           <KeywordInput
             isLoading
             onChange={e => setSearchKeyword(e.target.value)}

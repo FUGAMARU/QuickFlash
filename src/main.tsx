@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client"
 import "destyle.css"
 import "@/styles/globals.css"
 import "@fontsource/ibm-plex-sans-jp/400.css"
+import "@fontsource/ibm-plex-sans-jp/700.css"
 
 import App from "@/App"
 
