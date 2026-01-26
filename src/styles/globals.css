@@ -5,6 +5,7 @@ body {
   overflow: hidden;
   font-family: "IBM Plex Sans JP", sans-serif;
   color: var(--color-dark);
+  word-break: break-all;
 }
 
 span {

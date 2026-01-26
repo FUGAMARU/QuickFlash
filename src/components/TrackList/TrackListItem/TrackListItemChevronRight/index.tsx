@@ -1,0 +1,12 @@
+export const TrackListItemChevronRight = () => {
+  return (
+    <svg fill="none" viewBox="0 0 12 24" xmlns="http://www.w3.org/2000/svg">
+      <path
+        clipRule="evenodd"
+        d="M10.157 12.711L4.5 18.368L3.086 16.954L8.036 12.004L3.086 7.05401L4.5 5.64001L10.157 11.297C10.3445 11.4845 10.4498 11.7389 10.4498 12.004C10.4498 12.2692 10.3445 12.5235 10.157 12.711Z"
+        fill="currentColor"
+        fillRule="evenodd"
+      />
+    </svg>
+  )
+}
