@@ -1,8 +1,13 @@
 :root {
   --color-white: #fff;
   --color-black-alpha-10: rgba(0, 0, 0, 0.1);
-  --color-dark: #565656;
+  --color-dark: #676767;
   --color-gray: #b1b1b1;
   --color-soft-gray: #eeeeee;
-  --color-primary-deep: #baf718;
+  --color-primary-10: #f5ffe4;
+  --color-primary-20: #e3fd9f;
+  --color-primary-30: #d2f78c;
+  --color-primary-40: #c4ef6e;
+  --color-primary-50: #bef242;
+  --color-primary-60: #82c93a;
 }
