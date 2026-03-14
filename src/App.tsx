@@ -239,9 +239,7 @@ function App() {
     <main className={styles.layoutContainer}>
       <aside className={styles.sidebar}>
         <div className={styles.upper}>
-          <div className={styles.user}>
-            <UserInfoLabel emailAddress="user@example.com" />
-          </div>
+          <UserInfoLabel emailAddress="user@example.com" />
           <KeywordInput
             isLoading
             onChange={e => setSearchKeyword(e.target.value)}

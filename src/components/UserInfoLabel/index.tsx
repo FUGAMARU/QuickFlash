@@ -8,8 +8,11 @@ type Props = {
 export const UserInfoLabel = ({ emailAddress }: Props) => {
   return (
     <div className={styles.userInfoLabel}>
-      <div className={styles.dot} />
-      <TrimmedText className={styles.label}>{emailAddress}</TrimmedText>
+      <span className={styles.logo}>QuickFlash</span>
+      <div className={styles.user}>
+        <div className={styles.dot} />
+        <TrimmedText className={styles.label}>{emailAddress}</TrimmedText>
+      </div>
     </div>
   )
 }

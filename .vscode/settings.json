@@ -1,5 +1,5 @@
 {
-  "cSpell.ignoreWords": ["tauri", "pkce", "vite", "oxfmt", "destyle"],
+  "cSpell.ignoreWords": ["tauri", "pkce", "vite", "oxfmt", "destyle", "gabarito"],
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnSave": true,
