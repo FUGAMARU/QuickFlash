@@ -1,8 +1,8 @@
 .userInfoLabel {
-  padding-inline: 4px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding-inline: 4px;
 
   > .logo {
     font-family: Gabarito;
@@ -13,16 +13,16 @@
   }
 
   > .user {
-    gap: 6px;
     display: flex;
+    gap: 6px;
     align-items: center;
 
     > .dot {
       flex-shrink: 0;
       width: 8px;
       height: 8px;
-      border-radius: 50%;
       background-color: var(--color-primary-50);
+      border-radius: 50%;
     }
 
     > .label {

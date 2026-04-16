@@ -43,16 +43,5 @@
       height: auto;
       background-color: #e4c2ff;
     }
-
-    > .info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 32px;
-      background-image: linear-gradient(rgba(20, 24, 32, 0.03), rgba(20, 24, 32, 0.03)), url("/info-bg.svg");
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
   }
 }

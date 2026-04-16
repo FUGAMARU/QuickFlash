@@ -1,9 +1,9 @@
 :root {
   --color-white: #fff;
-  --color-black-alpha-10: rgba(0, 0, 0, 0.1);
+  --color-black-alpha-10: rgb(0 0 0 / 10%);
   --color-dark: #676767;
   --color-gray: #b1b1b1;
-  --color-soft-gray: #eeeeee;
+  --color-soft-gray: #eee;
   --color-primary-10: #f5ffe4;
   --color-primary-20: #e3fd9f;
   --color-primary-30: #d2f78c;

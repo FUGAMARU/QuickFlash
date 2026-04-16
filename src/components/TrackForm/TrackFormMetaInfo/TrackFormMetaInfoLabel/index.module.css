@@ -1,0 +1,27 @@
+.trackFormMetaInfoLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+
+  &.LeftAligned {
+    align-items: flex-start;
+  }
+
+  > .label {
+    min-width: 64px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-white);
+    text-align: center;
+    background-color: var(--color-gray);
+    border-radius: 100px;
+    text-box: trim-both cap alphabetic;
+  }
+
+  > .text {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+}

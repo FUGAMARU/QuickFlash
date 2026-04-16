@@ -6,3 +6,10 @@ export const isValidString = (value: string | undefined | null): value is string
 
 export const isValidArray = <T>(value: Array<T> | undefined | null): value is Array<T> =>
   isDefined(value) && value.length > 0
+
+export const getFilenameFromPath = (filePath: string): string => {
+  const filePathParts = filePath.split(/[/\\]/)
+  const fileName = filePathParts[filePathParts.length - 1]
+
+  return isValidString(fileName) ? fileName : filePath
+}

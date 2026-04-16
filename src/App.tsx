@@ -5,6 +5,7 @@ import { useState } from "react"
 
 import styles from "@/App.module.css"
 import { KeywordInput } from "@/components/KeywordInput"
+import { TrackForm } from "@/components/TrackForm"
 import { TrackList } from "@/components/TrackList"
 import { UserInfoLabel } from "@/components/UserInfoLabel"
 import { isValidString } from "@/utils"
@@ -253,7 +254,7 @@ function App() {
       </aside>
       <div className={styles.right}>
         <div className={styles.artwork}>アートワーク</div>
-        <div className={styles.info}>info</div>
+        <TrackForm />
       </div>
     </main>
   )
