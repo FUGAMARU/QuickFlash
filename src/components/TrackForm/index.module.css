@@ -1,10 +1,17 @@
 .trackForm {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 32px;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
   background-image: linear-gradient(rgb(20 24 32 / 3%), rgb(20 24 32 / 3%)), url("/info-bg.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+
+  > .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px;
+  }
 }

@@ -1,0 +1,98 @@
+.trackFormInputGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 42px 74.75px;
+  overflow: hidden;
+  background-color: var(--color-white);
+  border-radius: 8px;
+
+  > .primary {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  > .secondary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px 32px 0 0;
+  }
+}
+
+.flashButton {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 90px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--color-primary-20), var(--color-primary-50));
+  box-shadow: 0 -2px 8px 0 rgb(0 0 0 / 10%);
+  transform: rotate(-45deg) translate(32px, 50px);
+  transition: box-shadow 180ms ease;
+
+  &::after {
+    position: absolute;
+    top: -40%;
+    left: -130%;
+    width: 80%;
+    height: 180%;
+    pointer-events: none;
+    content: "";
+    background: linear-gradient(
+      to right,
+      rgb(255 255 255 / 0%),
+      rgb(255 255 255 / 65%),
+      rgb(255 255 255 / 0%)
+    );
+    opacity: 0;
+    transform: rotate(18deg);
+  }
+
+  &:hover {
+    box-shadow:
+      0 -2px 10px 0 rgb(0 0 0 / 6%),
+      0 0 16px 0 rgb(255 255 255 / 45%);
+
+    &::after {
+      opacity: 1;
+      animation: flash-button-glint 480ms ease-out;
+    }
+  }
+
+  > .text {
+    text-box: trim-both cap alphabetic;
+    position: relative;
+    z-index: 1;
+    font-family: Outfit, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    transform: translateZ(0);
+  }
+
+  > .icon {
+    position: relative;
+    z-index: 1;
+    width: 48px;
+    height: 48px;
+    transform: translateZ(0);
+  }
+}
+
+@keyframes flash-button-glint {
+  from {
+    left: -130%;
+  }
+
+  to {
+    left: 160%;
+    opacity: 0;
+  }
+}

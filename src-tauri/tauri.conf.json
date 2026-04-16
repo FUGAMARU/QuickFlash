@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "quickflash",
+  "productName": "QuickFlash",
   "version": "0.1.0",
   "identifier": "com.fugamaru.quickflash",
   "build": {
@@ -14,7 +14,7 @@
       {
         "title": "QuickFlash",
         "width": 1280,
-        "height": 720
+        "height": 810
       }
     ],
     "security": {

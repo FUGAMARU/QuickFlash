@@ -15,6 +15,7 @@
   "dependencies": {
     "@fontsource/gabarito": "^5.2.8",
     "@fontsource/ibm-plex-sans-jp": "^5.2.8",
+    "@fontsource/outfit": "^5.2.8",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-opener": "^2",

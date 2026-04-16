@@ -1,6 +1,6 @@
 import { useId, useState } from "react"
 
-import styles from "@/components/TrackForm/TrackFormInput/index.module.css"
+import styles from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupItem/index.module.css"
 import { isValidArray } from "@/utils"
 
 type LabelValuePair = {
@@ -16,7 +16,13 @@ type Props = LabelValuePair & {
   }
 }
 
-export const TrackFormInput = ({ label, placeholder, onInput, radioOption, value }: Props) => {
+export const TrackFormInputGroupItem = ({
+  label,
+  placeholder,
+  onInput,
+  radioOption,
+  value
+}: Props) => {
   const inputId = useId()
   const radioGroupName = useId()
   const hasRadioOption = isValidArray(radioOption.itemList)

@@ -4,18 +4,18 @@
   height: 100vh;
 
   > .sidebar {
+    display: flex;
     flex: 3.5;
+    flex-direction: column;
     max-width: 450px;
     height: 100%;
-    display: flex;
-    flex-direction: column;
 
     > .upper {
-      width: 100%;
       display: flex;
-      gap: 8px;
-      padding: 16px 20px;
       flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      padding: 16px 20px;
     }
 
     > .divider {
@@ -26,21 +26,25 @@
     }
 
     > .list {
-      padding: 8px 12px;
       flex: 1;
       min-height: 0;
+      padding: 8px 12px;
       overflow-y: auto;
     }
   }
 
   > .right {
+    display: flex;
     flex: 6.5;
+    flex-direction: column;
     height: 100%;
+    min-height: 0;
 
     > .artwork {
-      aspect-ratio: 4 / 1;
+      flex-shrink: 0;
       width: 100%;
       height: auto;
+      aspect-ratio: 4 / 1;
       background-color: #e4c2ff;
     }
   }

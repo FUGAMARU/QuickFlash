@@ -5,7 +5,7 @@
   padding-inline: 4px;
 
   > .logo {
-    font-family: Gabarito;
+    font-family: Gabarito, sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: var(--color-gray);
