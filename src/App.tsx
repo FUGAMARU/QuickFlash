@@ -253,7 +253,7 @@ function App() {
       </aside>
       <div className={styles.right}>
         <div className={styles.artwork}>アートワーク</div>
-        <form className={styles.form}>フォーム</form>
+        <div className={styles.info}>info</div>
       </div>
     </main>
   )
