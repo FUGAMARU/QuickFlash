@@ -85,6 +85,7 @@ export const TrackFormMetaInfo = ({ audioFilePath }: { audioFilePath: string }) 
         </button>
         <TrackFormMetaInfoLabel
           isLeftAligned
+          isTextTruncated
           label="ファイル名"
           text={getFilenameFromPath(audioFilePath)}
         />

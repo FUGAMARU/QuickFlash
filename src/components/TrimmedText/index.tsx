@@ -1,8 +1,8 @@
 import clsx from "clsx"
 
-import type { ComponentProps } from "react"
-
 import styles from "@/components/TrimmedText/index.module.css"
+
+import type { ComponentProps } from "react"
 
 type Props = Pick<ComponentProps<"span">, "className" | "children">
 

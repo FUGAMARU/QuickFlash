@@ -1,0 +1,107 @@
+.trackFormInput {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  > .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    > .label {
+      padding-left: 2px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-dark);
+      text-box: trim-both cap alphabetic;
+    }
+
+    > .option {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      > .label {
+        font-size: 10px;
+        color: var(--color-soft-dark);
+        text-box: trim-both cap alphabetic;
+      }
+
+      > .list {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+    }
+  }
+
+  > .input {
+    width: 100%;
+    height: 42px;
+    padding-inline: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    color: var(--color-dark);
+    white-space: nowrap;
+    caret-color: var(--color-gray);
+    outline: none;
+    background-color: var(--color-primary-10);
+    border: solid 1px var(--color-primary-40);
+    border-radius: 4px;
+    transition:
+      border-color 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  > .input:focus {
+    border-color: var(--color-primary-50);
+    box-shadow: 0 0 0 3px rgb(190 242 66 / 20%);
+  }
+}
+
+.optionItem {
+  position: relative;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  cursor: pointer;
+
+  > .input {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  > .control {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-white);
+    border: solid 2px var(--color-primary-40);
+    border-radius: 50%;
+  }
+
+  > .control::after {
+    width: 8px;
+    height: 8px;
+    content: "";
+    background-color: transparent;
+    border-radius: 50%;
+    transition: background-color 120ms ease;
+  }
+
+  > .input:checked + .control::after {
+    background-color: var(--color-primary-40);
+  }
+
+  > .text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-soft-dark);
+    text-box: trim-both cap alphabetic;
+  }
+}
