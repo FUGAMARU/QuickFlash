@@ -6,16 +6,18 @@ import type { TrackFormAudioFileMetaInfo } from "@/hooks/useTrackFormAudioFile"
 
 type Props = {
   isPlaying: boolean
+  isPlaybackStarting: boolean
   info: TrackFormAudioFileMetaInfo
   onPlayButtonClick: () => void
 }
 
-export const TrackForm = ({ info, isPlaying, onPlayButtonClick }: Props) => {
+export const TrackForm = ({ info, isPlaying, isPlaybackStarting, onPlayButtonClick }: Props) => {
   return (
     <div className={styles.trackForm}>
       <div className={styles.inner}>
         <TrackFormMetaInfo
           info={info}
+          isPlaybackStarting={isPlaybackStarting}
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />

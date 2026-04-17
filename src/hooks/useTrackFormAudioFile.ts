@@ -31,16 +31,25 @@ const DUMMY_AUDIO_META_INFO = {
 export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string }) => {
   const isTauriEnvironment = isTauri()
   const audioPlayRef = useRef<HTMLAudioElement | null>(null)
+  const hasPlayedOnceRef = useRef(false)
+  const isPlaybackPendingRef = useRef(false)
   const [metaInfo, setMetaInfo] = useState<TrackFormAudioFileMetaInfoResponse>(() =>
     isTauriEnvironment ? { ...EMPTY_AUDIO_META_INFO } : { ...DUMMY_AUDIO_META_INFO }
   )
   const [isPlaying, setIsPlaying] = useState(false)
+  const [playbackStartingFilePath, setPlaybackStartingFilePath] = useState<string | null>(null)
 
   const fileName = isValidString(audioFilePath) ? getFilenameFromPath(audioFilePath) : ""
+  const isPlaybackStarting = isValidString(audioFilePath) && playbackStartingFilePath === audioFilePath
   const info = {
     ...metaInfo,
     fileName
   } satisfies TrackFormAudioFileMetaInfo
+
+  const clearPlaybackStartingState = () => {
+    isPlaybackPendingRef.current = false
+    setPlaybackStartingFilePath(null)
+  }
 
   const handlePlayButtonClick = () => {
     if (!isValidString(audioFilePath)) {
@@ -51,8 +60,18 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
       const audioSource = isTauriEnvironment ? convertFileSrc(audioFilePath) : audioFilePath
       const audio = new Audio(audioSource)
       audio.preload = "auto"
+      audio.onpause = () => {
+        setIsPlaying(false)
+        clearPlaybackStartingState()
+      }
+      audio.onplaying = () => {
+        hasPlayedOnceRef.current = true
+        setIsPlaying(true)
+        clearPlaybackStartingState()
+      }
       audio.onended = () => {
         setIsPlaying(false)
+        clearPlaybackStartingState()
       }
       audioPlayRef.current = audio
     }
@@ -63,9 +82,12 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
       return
     }
 
+    if (isPlaybackPendingRef.current) {
+      return
+    }
+
     if (isPlaying) {
       audio.pause()
-      setIsPlaying(false)
       return
     }
 
@@ -73,18 +95,20 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
       audio.currentTime = 0
     }
 
-    audio.play().then(
-      () => {
-        setIsPlaying(true)
-      },
-      () => {
-        setIsPlaying(false)
-        alert("ファイルの再生開始に失敗しました")
-      }
-    )
+    isPlaybackPendingRef.current = true
+    setPlaybackStartingFilePath(hasPlayedOnceRef.current ? null : audioFilePath)
+
+    audio.play().catch(() => {
+      clearPlaybackStartingState()
+      setIsPlaying(false)
+      alert("ファイルの再生開始に失敗しました")
+    })
   }
 
   useEffect(() => {
+    hasPlayedOnceRef.current = false
+    isPlaybackPendingRef.current = false
+
     if (isTauriEnvironment && isValidString(audioFilePath)) {
       invoke<TrackFormAudioFileMetaInfoResponse>("read_audio_file_meta_info", {
         filePath: audioFilePath
@@ -105,10 +129,14 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
       }
 
       audioPlayRef.current.pause()
+      audioPlayRef.current.onpause = null
+      audioPlayRef.current.onplaying = null
       audioPlayRef.current.onended = null
       audioPlayRef.current.currentTime = 0
       audioPlayRef.current = null
       setIsPlaying(false)
+      hasPlayedOnceRef.current = false
+      clearPlaybackStartingState()
     }
   }, [audioFilePath, isTauriEnvironment])
 
@@ -116,6 +144,7 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
     artworkUrl: info.artworkDataUrl,
     info,
     isPlaying,
+    isPlaybackStarting,
     onPlayButtonClick: handlePlayButtonClick
   }
 }

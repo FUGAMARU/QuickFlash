@@ -148,9 +148,10 @@ const App = () => {
   const [authInProgress, setAuthInProgress] = useState(false)
   const [mp3Title, setMp3Title] = useState<string | null>(null)
   const [mp3Error, setMp3Error] = useState<string | null>(null)
-  const { artworkUrl, info, isPlaying, onPlayButtonClick } = useTrackFormAudioFile({
-    audioFilePath: import.meta.env.VITE_DEV_AUDIO_FILE_PATH
-  })
+  const { artworkUrl, info, isPlaying, isPlaybackStarting, onPlayButtonClick } =
+    useTrackFormAudioFile({
+      audioFilePath: import.meta.env.VITE_DEV_AUDIO_FILE_PATH
+    })
 
   async function startSpotifyAuth() {
     try {
@@ -254,7 +255,12 @@ const App = () => {
         <div className={styles.artwork}>
           <ArtworkView artworkUrl={artworkUrl} />
         </div>
-        <TrackForm info={info} isPlaying={isPlaying} onPlayButtonClick={onPlayButtonClick} />
+        <TrackForm
+          info={info}
+          isPlaybackStarting={isPlaybackStarting}
+          isPlaying={isPlaying}
+          onPlayButtonClick={onPlayButtonClick}
+        />
       </div>
     </main>
   )
