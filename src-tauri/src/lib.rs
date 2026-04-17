@@ -1,5 +1,6 @@
 mod pkce;
 
+use base64::{engine::general_purpose::STANDARD, Engine};
 use id3::{Tag, TagLike};
 use pkce::{start_server, AppState};
 use serde::Serialize;
@@ -12,6 +13,7 @@ use std::{
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct AudioFileMetaInfo {
+    artwork_data_url: String,
     quality_text: String,
     duration_text: String,
     size_text: String,
@@ -56,8 +58,10 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
     let duration = mp3_duration::from_path(&file_path)
         .map_err(|e| format!("音源ファイルの再生時間取得に失敗しました: {}", e))?;
     let frame_header_info = read_mp3_frame_header_info(&file_path)?;
+    let artwork_data_url = read_audio_file_artwork_data_url(&file_path).unwrap_or_default();
 
     Ok(AudioFileMetaInfo {
+        artwork_data_url,
         quality_text: format!(
             "{}kbps / {}",
             frame_header_info.bitrate_kbps,
@@ -66,6 +70,48 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
         duration_text: format_duration(duration),
         size_text: format_file_size(file_size),
     })
+}
+
+fn read_audio_file_artwork_data_url(file_path: &str) -> Option<String> {
+    let tag = Tag::read_from_path(file_path).ok()?;
+    let picture = tag.pictures().next()?;
+
+    if picture.data.is_empty() {
+        return None;
+    }
+
+    let mime_type = if picture.mime_type.trim().is_empty() {
+        detect_image_mime_type(&picture.data).to_string()
+    } else {
+        picture.mime_type.clone()
+    };
+    let image_data_base64 = STANDARD.encode(&picture.data);
+
+    Some(format!("data:{};base64,{}", mime_type, image_data_base64))
+}
+
+fn detect_image_mime_type(image_data: &[u8]) -> &'static str {
+    if image_data.starts_with(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) {
+        return "image/png";
+    }
+
+    if image_data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+        return "image/jpeg";
+    }
+
+    if image_data.starts_with(b"GIF87a") || image_data.starts_with(b"GIF89a") {
+        return "image/gif";
+    }
+
+    if image_data.len() >= 12 && image_data.starts_with(b"RIFF") && &image_data[8..12] == b"WEBP" {
+        return "image/webp";
+    }
+
+    if image_data.starts_with(&[0x42, 0x4D]) {
+        return "image/bmp";
+    }
+
+    "image/jpeg"
 }
 
 fn format_duration(duration: Duration) -> String {

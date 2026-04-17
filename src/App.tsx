@@ -9,6 +9,7 @@ import { KeywordInput } from "@/components/KeywordInput"
 import { TrackForm } from "@/components/TrackForm"
 import { TrackList } from "@/components/TrackList"
 import { UserInfoLabel } from "@/components/UserInfoLabel"
+import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
 import { isValidString } from "@/utils"
 
 const SPOTIFY_PKCE_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
@@ -141,19 +142,15 @@ const DUMMY_TRACK_LIST = [
   }
 ]
 
-function App() {
+const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
-  const [greetMsg, setGreetMsg] = useState("")
-  const [name, setName] = useState("")
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [authInProgress, setAuthInProgress] = useState(false)
   const [mp3Title, setMp3Title] = useState<string | null>(null)
   const [mp3Error, setMp3Error] = useState<string | null>(null)
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }))
-  }
+  const { artworkUrl, info, isPlaying, onPlayButtonClick } = useTrackFormAudioFile({
+    audioFilePath: import.meta.env.VITE_DEV_AUDIO_FILE_PATH
+  })
 
   async function startSpotifyAuth() {
     try {
@@ -255,12 +252,9 @@ function App() {
       </aside>
       <div className={styles.right}>
         <div className={styles.artwork}>
-          <ArtworkView
-            // artworkUrl=""
-            artworkUrl="https://i.scdn.co/image/ab67616d0000b27383699244e61f3fa4e7f8be2d"
-          />
+          <ArtworkView artworkUrl={artworkUrl} />
         </div>
-        <TrackForm />
+        <TrackForm info={info} isPlaying={isPlaying} onPlayButtonClick={onPlayButtonClick} />
       </div>
     </main>
   )
