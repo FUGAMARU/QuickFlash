@@ -1,4 +1,4 @@
-import { convertFileSrc, invoke } from "@tauri-apps/api/core"
+import { convertFileSrc, invoke, isTauri } from "@tauri-apps/api/core"
 import { useEffect, useRef, useState } from "react"
 
 import styles from "@/components/TrackForm/TrackFormMetaInfo/index.module.css"
@@ -7,13 +7,24 @@ import { TrackFormMetaInfoPauseIcon } from "@/components/TrackForm/TrackFormMeta
 import { TrackFormMetaInfoPlayIcon } from "@/components/TrackForm/TrackFormMetaInfo/TrackFormMetaInfoPlayIcon"
 import { getFilenameFromPath, isDefined } from "@/utils"
 
+const DUMMY_AUDIO_META_INFO = {
+  durationText: "03:42",
+  qualityText: "44.1kHz / 320kbps",
+  sizeText: "8.7MB"
+}
+
 export const TrackFormMetaInfo = ({ audioFilePath }: { audioFilePath: string }) => {
+  const isTauriEnvironment = isTauri()
   const audioPlayRef = useRef<HTMLAudioElement | null>(null)
-  const [info, setInfo] = useState({
-    durationText: "",
-    qualityText: "",
-    sizeText: ""
-  })
+  const [info, setInfo] = useState(() =>
+    isTauriEnvironment
+      ? {
+          durationText: "",
+          qualityText: "",
+          sizeText: ""
+        }
+      : DUMMY_AUDIO_META_INFO
+  )
   const [isPlaying, setIsPlaying] = useState(false)
 
   const handlePlayButtonClick = async () => {
@@ -54,16 +65,18 @@ export const TrackFormMetaInfo = ({ audioFilePath }: { audioFilePath: string }) 
   }
 
   useEffect(() => {
-    void invoke<typeof info>("read_audio_file_meta_info", {
-      filePath: audioFilePath
-    }).then(
-      metaInfo => {
-        setInfo(metaInfo)
-      },
-      () => {
-        alert("音源のメタデータの取得に失敗しました")
-      }
-    )
+    if (isTauriEnvironment) {
+      invoke<typeof info>("read_audio_file_meta_info", {
+        filePath: audioFilePath
+      }).then(
+        metaInfo => {
+          setInfo(metaInfo)
+        },
+        () => {
+          alert("音源のメタデータの取得に失敗しました")
+        }
+      )
+    }
 
     return () => {
       if (!isDefined(audioPlayRef.current)) {
@@ -75,7 +88,7 @@ export const TrackFormMetaInfo = ({ audioFilePath }: { audioFilePath: string }) 
       audioPlayRef.current.currentTime = 0
       audioPlayRef.current = null
     }
-  }, [audioFilePath])
+  }, [audioFilePath, isTauriEnvironment])
 
   return (
     <div className={styles.trackFormMetaInfo}>
