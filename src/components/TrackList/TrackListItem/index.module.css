@@ -1,9 +1,9 @@
 .trackListItem {
   display: flex;
-  align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  align-items: center;
   width: 100%;
+  padding: 10px 12px;
 
   &:hover {
     > .right > .chevron {
@@ -12,11 +12,11 @@
   }
 
   > .artwork {
+    flex-shrink: 0;
     width: 84px;
     aspect-ratio: 1 / 1;
     padding: 4px;
     border-radius: 4px;
-    flex-shrink: 0;
     box-shadow: 2px 3px 12px var(--color-black-alpha-10);
 
     > .image {
@@ -28,10 +28,10 @@
 
   > .right {
     display: flex;
-    width: 100%;
+    gap: 12px;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    width: 100%;
 
     > .overview {
       display: flex;
@@ -51,14 +51,14 @@
 
         > .detail {
           display: flex;
-          align-items: center;
           gap: 6px;
+          align-items: center;
 
           > .icon {
+            display: inline-flex;
             width: 14px;
             height: 14px;
             color: var(--color-gray);
-            display: inline-flex;
           }
 
           > .text {
@@ -76,17 +76,17 @@
       height: 24px;
       color: var(--color-gray);
       opacity: 0;
+      transform: translateZ(0);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       will-change: opacity;
-      transform: translateZ(0);
     }
   }
 }
 
 .maxOneLine {
-  overflow: hidden;
   display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
   line-clamp: 1;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
 }

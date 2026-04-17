@@ -4,6 +4,7 @@ import { open } from "@tauri-apps/plugin-shell"
 import { useState } from "react"
 
 import styles from "@/App.module.css"
+import { ArtworkView } from "@/components/ArtworkView"
 import { KeywordInput } from "@/components/KeywordInput"
 import { TrackForm } from "@/components/TrackForm"
 import { TrackList } from "@/components/TrackList"
@@ -253,7 +254,12 @@ function App() {
         </div>
       </aside>
       <div className={styles.right}>
-        <div className={styles.artwork}>アートワーク</div>
+        <div className={styles.artwork}>
+          <ArtworkView
+            // artworkUrl=""
+            artworkUrl="https://i.scdn.co/image/ab67616d0000b27383699244e61f3fa4e7f8be2d"
+          />
+        </div>
         <TrackForm />
       </div>
     </main>

@@ -1,14 +1,14 @@
-import js from "@eslint/js";
-import globals from "globals";
-import eslintPluginReactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
-import eslintPluginImport from "eslint-plugin-import";
-import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
-import eslintPluginReactConfig from "eslint-plugin-react/configs/recommended.js";
-import typescriptEslintParser from "@typescript-eslint/parser";
-import reactYouMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect";
+import js from "@eslint/js"
+import globals from "globals"
+import eslintPluginReactHooks from "eslint-plugin-react-hooks"
+import reactRefresh from "eslint-plugin-react-refresh"
+import tseslint from "typescript-eslint"
+import eslintConfigPrettier from "eslint-config-prettier"
+import eslintPluginImport from "eslint-plugin-import"
+import tsEslintPlugin from "@typescript-eslint/eslint-plugin"
+import eslintPluginReactConfig from "eslint-plugin-react/configs/recommended.js"
+import typescriptEslintParser from "@typescript-eslint/parser"
+import reactYouMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect"
 
 export default tseslint.config(
   {
@@ -19,8 +19,8 @@ export default tseslint.config(
       ".stylelintrc.js",
       "eslint.config.js",
       "vite.config.ts",
-      "src/vite-env.d.ts",
-    ],
+      "src/vite-env.d.ts"
+    ]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -33,32 +33,29 @@ export default tseslint.config(
       parser: typescriptEslintParser,
       parserOptions: {
         project: ["./tsconfig.node.json", "./tsconfig.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
+        tsconfigRootDir: import.meta.dirname
+      }
+    }
   },
   {
     ...eslintPluginReactConfig,
     settings: {
       react: {
-        version: "detect",
-      },
-    },
+        version: "detect"
+      }
+    }
   },
   {
     plugins: {
       "react-hooks": eslintPluginReactHooks,
       "react-refresh": reactRefresh,
       import: eslintPluginImport,
-      "@typescript-eslint": tsEslintPlugin,
+      "@typescript-eslint": tsEslintPlugin
     },
     rules: {
       /** Viteプロジェクト作成時に初期状態で存在したルール */
       ...eslintPluginReactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       /** 不要なスペースは禁止 */
       "no-trailing-spaces": "error",
       "no-multi-spaces": "error",
@@ -71,34 +68,28 @@ export default tseslint.config(
       /** if文の括弧の省略禁止 */
       curly: "error",
       /** 暗黙の型変換を防ぐ */
-      "no-implicit-coercion": [
-        "error",
-        { boolean: false, number: true, string: true },
-      ],
+      "no-implicit-coercion": ["error", { boolean: false, number: true, string: true }],
       /** 相対パスインポート禁止 */
       "no-restricted-imports": [
         "error",
         {
-          patterns: ["./", "../"],
-        },
+          patterns: ["./", "../"]
+        }
       ],
       /** 非nullアサーション演算子(!)の使用を禁止する */
       "@typescript-eslint/no-non-null-assertion": "error",
       /** typeのみをimportする時はtypeと記載することを強制する */
       "@typescript-eslint/consistent-type-imports": "error",
       /** 配列の型定義をする際にArray<T>を強制する (T[]は禁止) */
-      "@typescript-eslint/array-type": [
-        "error",
-        { default: "generic", readonly: "generic" },
-      ],
+      "@typescript-eslint/array-type": ["error", { default: "generic", readonly: "generic" }],
       /** 条件式での暗黙の型変換を防ぐ */
       "@typescript-eslint/strict-boolean-expressions": [
         "error",
         {
           allowString: false,
           allowNumber: false,
-          allowNullableObject: false,
-        },
+          allowNullableObject: false
+        }
       ],
       /** React 17以降の新しいJSX変換ではReactをインポートする必要がないためオフにする */
       "react/react-in-jsx-scope": "off",
@@ -124,8 +115,8 @@ export default tseslint.config(
           shorthandLast: false,
           ignoreCase: true,
           noSortAlphabetically: false,
-          reservedFirst: true,
-        },
+          reservedFirst: true
+        }
       ],
       /** importの順番を種類ごとに統一する */
       "import/order": [
@@ -138,19 +129,25 @@ export default tseslint.config(
             ["parent", "sibling"], // 相対パス
             "index",
             "object",
-            "type",
+            "type"
           ],
           "newlines-between": "always", // グループごとに空行を入れる
-          alphabetize: { order: "asc", caseInsensitive: true }, // アルファベット順
-        },
-      ],
+          alphabetize: { order: "asc", caseInsensitive: true } // アルファベット順
+        }
+      ]
     },
     settings: {
       "import/resolver": {
         typescript: {
-          project: ["./tsconfig.node.json", "./tsconfig.json"],
-        },
-      },
-    },
+          project: ["./tsconfig.node.json", "./tsconfig.json"]
+        }
+      }
+    }
   },
-);
+  {
+    files: ["src/components/ArtworkView/index.tsx"],
+    rules: {
+      "react/no-unknown-property": "off"
+    }
+  }
+)
