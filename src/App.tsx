@@ -12,6 +12,8 @@ import { UserInfoLabel } from "@/components/UserInfoLabel"
 import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
 import { isValidString } from "@/utils"
 
+import { Signin } from "@/components/Signin"
+
 const SPOTIFY_PKCE_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
 const SPOTIFY_PKCE_REDIRECT_URI = "http://127.0.0.1:8888/pkce"
 const SPOTIFY_PKCE_SCOPES = "user-read-private user-read-email"
@@ -233,6 +235,10 @@ const App = () => {
       console.error("MP3読み取りエラー:", error)
       setMp3Error(String(error))
     }
+  }
+
+  if (!isValidString(accessToken)) {
+    return <Signin isLoading={authInProgress} onSignInButtonClick={startSpotifyAuth} />
   }
 
   return (

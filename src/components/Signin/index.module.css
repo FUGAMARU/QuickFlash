@@ -1,0 +1,82 @@
+.signIn {
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/info-bg.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  > .card {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 48px;
+    background-color: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 1px 1px 16px 0 var(--color-black-alpha-10);
+
+    > .brand {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+
+      > .icon {
+        width: 56px;
+        height: 56px;
+      }
+
+      > .text {
+        padding-bottom: 8px;
+        font-family: Gabarito, sans-serif;
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--color-dark);
+        text-box: trim-both cap alphabetic;
+      }
+    }
+
+    > .divider {
+      width: 100%;
+      margin-block: 16px;
+      border-top: 1px dotted var(--color-gray);
+    }
+
+    > .lower {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+
+      > .note {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--color-gray);
+      }
+    }
+  }
+}
+
+.signInButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 200px;
+  height: 42px;
+  padding-inline: 16px;
+  color: var(--color-white);
+  background: linear-gradient(to bottom, var(--color-primary-30), var(--color-primary-60));
+  border-radius: 4px;
+
+  > .text {
+    font-family: Gabarito, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-box: trim-both cap alphabetic;
+  }
+
+  > .logo {
+    width: 18px;
+    height: 18px;
+  }
+}
