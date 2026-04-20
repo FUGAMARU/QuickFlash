@@ -183,7 +183,7 @@ export const useSpotifyAuthSession = () => {
   }, [])
 
   const onSignoutButtonClick = useCallback(() => {
-    void clearAuthSession()
+    clearAuthSession()
   }, [clearAuthSession])
 
   const applyAuthSession = useCallback(async (authSession: SpotifyAuthSession) => {
