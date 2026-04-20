@@ -3,7 +3,6 @@ import clsx from "clsx"
 import styles from "@/components/TrackList/TrackListItem/index.module.css"
 import { TrackListItemAlbumIcon } from "@/components/TrackList/TrackListItem/TrackListItemAlbumIcon"
 import { TrackListItemArtistIcon } from "@/components/TrackList/TrackListItem/TrackListItemArtistIcon"
-import { TrackListItemChevronRight } from "@/components/TrackList/TrackListItem/TrackListItemChevronRight"
 import { TrimmedText } from "@/components/TrimmedText"
 import { isValidArray } from "@/utils"
 
@@ -58,10 +57,6 @@ export const TrackListItem = ({
             </div>
           </div>
         </div>
-
-        <span className={styles.chevron}>
-          <TrackListItemChevronRight />
-        </span>
       </div>
     </button>
   )
