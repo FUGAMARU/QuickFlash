@@ -23,6 +23,7 @@
     /* Path Mapping */
     "baseUrl": ".",
     "paths": {
+      "@config/*": ["config/*"],
       "@/*": ["src/*"]
     }
   },

@@ -5,10 +5,11 @@ use id3::{Tag, TagLike};
 use pkce::{start_server, AppState};
 use serde::Serialize;
 use std::{
-    fs::{metadata, File},
+    fs::{create_dir_all, metadata, File},
     io::{Read, Seek, SeekFrom},
     time::Duration,
 };
+use tauri::Manager;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -275,9 +276,18 @@ pub fn run() {
             read_audio_file_meta_info,
             read_mp3_title,
             pkce::start_spotify_auth,
-            pkce::get_access_token
+            pkce::get_auth_session,
+            pkce::refresh_spotify_access_token
         ])
-        .setup(move |_app| {
+        .setup(move |app| {
+            if let Ok(app_data_dir) = app.path().app_data_dir() {
+                if create_dir_all(&app_data_dir).is_ok() {
+                    let auth_session_file_path = app_data_dir.join("spotify_auth_session.json");
+                    *state_clone.auth_session_file_path.lock().unwrap() =
+                        Some(auth_session_file_path);
+                }
+            }
+
             // PKCE用にバックグラウンドでHTTPサーバーを起動
             let state_for_server = state_clone.clone();
             tauri::async_runtime::spawn(async move {

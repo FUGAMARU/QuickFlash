@@ -1,0 +1,4 @@
+{
+  "redirectUri": "http://127.0.0.1:8888/pkce",
+  "scopes": "user-read-private user-read-email"
+}
