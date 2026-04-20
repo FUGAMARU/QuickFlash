@@ -277,7 +277,8 @@ pub fn run() {
             read_mp3_title,
             pkce::start_spotify_auth,
             pkce::get_auth_session,
-            pkce::refresh_spotify_access_token
+            pkce::refresh_spotify_access_token,
+            pkce::clear_auth_session
         ])
         .setup(move |app| {
             if let Ok(app_data_dir) = app.path().app_data_dir() {

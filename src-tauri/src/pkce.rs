@@ -110,6 +110,24 @@ pub async fn refresh_spotify_access_token(
     Ok(refreshed_session)
 }
 
+#[tauri::command]
+pub async fn clear_auth_session(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    *state.auth_data.lock().unwrap() = None;
+    *state.auth_session.lock().unwrap() = None;
+    *state.spotify_client_id.lock().unwrap() = None;
+
+    let file_path = match auth_session_file_path(state.inner()) {
+        Some(path) => path,
+        None => return Ok(()),
+    };
+
+    if !file_path.exists() {
+        return Ok(());
+    }
+
+    fs::remove_file(&file_path).map_err(|e| format!("認証セッションの削除に失敗しました: {}", e))
+}
+
 fn generate_code_verifier() -> String {
     let mut rng = rand::thread_rng();
     let random_bytes: Vec<u8> = (0..32).map(|_| rng.gen()).collect();

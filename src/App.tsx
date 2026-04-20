@@ -140,6 +140,7 @@ const App = () => {
     accessToken,
     authInProgress,
     isAuthBootstrapInProgress,
+    onSignoutButtonClick,
     startSpotifyAuth,
     userEmailAddress
   } = useSpotifyAuthSession()
@@ -160,7 +161,10 @@ const App = () => {
     <main className={styles.layoutContainer}>
       <aside className={styles.sidebar}>
         <div className={styles.upper}>
-          <UserInfoLabel emailAddress={userEmailAddress ?? ""} />
+          <UserInfoLabel
+            emailAddress={userEmailAddress ?? ""}
+            onSignoutButtonClick={onSignoutButtonClick}
+          />
           <KeywordInput
             isLoading
             onChange={e => setSearchKeyword(e.target.value)}

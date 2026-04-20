@@ -168,13 +168,23 @@ export const useSpotifyAuthSession = () => {
   const [authInProgress, setAuthInProgress] = useState(false)
   const [isAuthBootstrapInProgress, setAuthBootstrapInProgress] = useState(true)
 
-  const clearAuthSession = useCallback(() => {
+  const clearAuthSession = useCallback(async () => {
     setAccessToken(undefined)
     setRefreshToken(undefined)
     setAccessTokenExpiresAtEpochSeconds(undefined)
     setUserEmailAddress(undefined)
     clearStoredSpotifyAuthSession()
+
+    try {
+      await invoke("clear_auth_session")
+    } catch {
+      // backend側のセッション削除失敗時も、UIはサインアウト済み状態を優先する
+    }
   }, [])
+
+  const onSignoutButtonClick = useCallback(() => {
+    void clearAuthSession()
+  }, [clearAuthSession])
 
   const applyAuthSession = useCallback(async (authSession: SpotifyAuthSession) => {
     setAccessToken(authSession.accessToken)
@@ -192,7 +202,7 @@ export const useSpotifyAuthSession = () => {
         const refreshedSession = await requestRefreshedSpotifySession(nextRefreshToken)
         await applyAuthSession(refreshedSession)
       } catch {
-        clearAuthSession()
+        await clearAuthSession()
       }
     },
     [applyAuthSession, clearAuthSession]
@@ -289,7 +299,7 @@ export const useSpotifyAuthSession = () => {
       await applyAuthSession(authSession)
     } catch (error) {
       alert(`Error: ${error}`)
-      clearAuthSession()
+      await clearAuthSession()
     } finally {
       setAuthInProgress(false)
     }
@@ -300,9 +310,17 @@ export const useSpotifyAuthSession = () => {
       accessToken,
       authInProgress,
       isAuthBootstrapInProgress,
+      onSignoutButtonClick,
       startSpotifyAuth,
       userEmailAddress
     }),
-    [accessToken, authInProgress, isAuthBootstrapInProgress, startSpotifyAuth, userEmailAddress]
+    [
+      accessToken,
+      authInProgress,
+      isAuthBootstrapInProgress,
+      onSignoutButtonClick,
+      startSpotifyAuth,
+      userEmailAddress
+    ]
   )
 }

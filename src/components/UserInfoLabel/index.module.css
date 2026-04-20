@@ -32,5 +32,12 @@
       text-transform: uppercase;
       text-box: trim-both cap alphabetic;
     }
+
+    > .signout {
+      display: inline-flex;
+      width: 12px;
+      height: 12px;
+      color: var(--color-gray);
+    }
   }
 }
