@@ -6,6 +6,7 @@ import { KeywordInput } from "@/components/KeywordInput"
 import { TrackForm } from "@/components/TrackForm"
 import { TrackList } from "@/components/TrackList"
 import { UserInfoLabel } from "@/components/UserInfoLabel"
+import { useRightAreaMp3DropOverlay } from "@/hooks/useRightAreaMp3DropOverlay"
 import { useSpotifyAuthSession } from "@/hooks/useSpotifyAuthSession"
 import { useSpotifyTrackSearch } from "@/hooks/useSpotifyTrackSearch"
 import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
@@ -15,6 +16,7 @@ import { Signin } from "@/components/Signin"
 
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
+  const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay()
   const {
     accessToken,
     authInProgress,
@@ -59,7 +61,7 @@ const App = () => {
           <TrackList itemList={trackList} />
         </div>
       </aside>
-      <div className={styles.right}>
+      <div className={styles.right} {...rightAreaDragProps}>
         <div className={styles.artwork}>
           <ArtworkView artworkUrl={artworkUrl} />
         </div>
@@ -69,6 +71,7 @@ const App = () => {
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
+        {isFileDragOver && <div className={styles.dropOverlay}>ドロップしてください</div>}
       </div>
     </main>
   )

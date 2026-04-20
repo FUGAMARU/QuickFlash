@@ -5,7 +5,7 @@ use id3::{Tag, TagLike};
 use pkce::{start_server, AppState};
 use serde::Serialize;
 use std::{
-    fs::{create_dir_all, metadata, File},
+    fs::{create_dir_all, metadata, read, File},
     io::{Read, Seek, SeekFrom},
     time::Duration,
 };
@@ -71,6 +71,11 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
         duration_text: format_duration(duration),
         size_text: format_file_size(file_size),
     })
+}
+
+#[tauri::command]
+fn read_file_bytes(file_path: String) -> Result<Vec<u8>, String> {
+    read(&file_path).map_err(|e| format!("ファイルの読み込みに失敗しました: {}", e))
 }
 
 fn read_audio_file_artwork_data_url(file_path: &str) -> Option<String> {
@@ -274,6 +279,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             read_audio_file_meta_info,
+            read_file_bytes,
             read_mp3_title,
             pkce::start_spotify_auth,
             pkce::get_auth_session,
