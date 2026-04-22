@@ -1,22 +1,23 @@
 import { invoke, isTauri } from "@tauri-apps/api/core"
-import { useState } from "react"
+import clsx from "clsx"
+import { useEffect, useRef, useState } from "react"
 
 import {
   ARTIST_SEPARATOR_RADIO_OPTION,
   replaceArtistSeparatorIfSafe
 } from "@/components/TrackForm/index.helpers"
+import {
+  FLASH_COMPLETED_RESET_DELAY_MS,
+  EMPTY_RADIO_OPTION
+} from "@/components/TrackForm/TrackFormInputGroup/index.helpers"
 import styles from "@/components/TrackForm/TrackFormInputGroup/index.module.css"
+import { TrackFormInputGroupCheckIcon } from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupCheckIcon"
 import { TrackFormInputGroupItem } from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupItem"
 import { TrackFormInputGroupSaveIcon } from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupSaveIcon"
 import { isDefined, isValidString } from "@/utils"
 
 import type { ArtistSeparatorRadioValue } from "@/components/TrackForm/index.helpers"
 import type { TrackFormAudioFileTagInfo } from "@/hooks/useTrackFormAudioFile"
-
-const EMPTY_RADIO_OPTION = {
-  label: "",
-  itemList: []
-}
 
 type Props = {
   audioFilePath: string | undefined
@@ -35,10 +36,34 @@ export const TrackFormInputGroup = ({
   onArtistSeparatorRadioValueChange,
   onFlashComplete
 }: Props) => {
+  const flashCompletedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [formValue, setFormValue] = useState(initialValue)
+  const [isFlashCompleted, setIsFlashCompleted] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
 
+  const clearFlashCompletedResetTimer = () => {
+    if (!isDefined(flashCompletedResetTimerRef.current)) {
+      return
+    }
+
+    window.clearTimeout(flashCompletedResetTimerRef.current)
+    flashCompletedResetTimerRef.current = undefined
+  }
+
+  const resetFlashCompleted = () => {
+    setIsFlashCompleted(false)
+    clearFlashCompletedResetTimer()
+  }
+
+  useEffect(() => {
+    return () => {
+      clearFlashCompletedResetTimer()
+    }
+  }, [])
+
   const handleInput = (key: keyof TrackFormAudioFileTagInfo) => (value: string) => {
+    resetFlashCompleted()
+
     setFormValue(current => ({
       ...current,
       [key]: value
@@ -48,6 +73,8 @@ export const TrackFormInputGroup = ({
   const handleArtistSeparatorRadioValueChange = (
     nextArtistSeparatorRadioValue: ArtistSeparatorRadioValue
   ) => {
+    resetFlashCompleted()
+
     setFormValue(current => {
       const replacedArtistText = replaceArtistSeparatorIfSafe({
         artistText: current.artist,
@@ -84,6 +111,12 @@ export const TrackFormInputGroup = ({
         }
       })
 
+      setIsFlashCompleted(true)
+      clearFlashCompletedResetTimer()
+      flashCompletedResetTimerRef.current = window.setTimeout(() => {
+        setIsFlashCompleted(false)
+        flashCompletedResetTimerRef.current = undefined
+      }, FLASH_COMPLETED_RESET_DELAY_MS)
       onFlashComplete()
     } catch {
       alert("音源ファイルへのタグ書き込みに失敗しました")
@@ -140,15 +173,24 @@ export const TrackFormInputGroup = ({
       </div>
 
       <button
-        className={styles.flashButton}
+        className={clsx(styles.flashButton, isFlashCompleted && styles.Completed)}
         disabled={isFlashButtonDisabled}
         onClick={handleFlashButtonClick}
         type="button"
       >
-        <span className={styles.text}>Flash!</span>
-        <span className={styles.icon}>
-          <TrackFormInputGroupSaveIcon />
-        </span>
+        <div className={styles.content}>
+          <span className={styles.idle}>
+            <span className={styles.text}>Flash!</span>
+            <span className={styles.icon}>
+              <TrackFormInputGroupSaveIcon />
+            </span>
+          </span>
+          <span className={styles.done}>
+            <span className={styles.check}>
+              <TrackFormInputGroupCheckIcon />
+            </span>
+          </span>
+        </div>
       </button>
     </div>
   )
