@@ -1,27 +1,37 @@
 import { useId, useState } from "react"
 
 import styles from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupItem/index.module.css"
-import { isValidArray } from "@/utils"
+import { isDefined } from "@/utils"
 
-type LabelValuePair = {
+type LabelValuePair<TValue extends string = string> = {
   label: string
-  value: string
+  value: TValue
 }
 
-type Props = LabelValuePair & {
+type Props<TRadioValue extends string = string> = LabelValuePair & {
   onInput: (value: string) => void
+  onRadioValueChange?: (value: TRadioValue) => void
   radioOption: Pick<LabelValuePair, "label"> & {
-    itemList: Array<LabelValuePair>
+    itemList: ReadonlyArray<LabelValuePair<TRadioValue>>
   }
+  radioValue?: TRadioValue
 }
 
-export const TrackFormInputGroupItem = ({ label, onInput, radioOption, value }: Props) => {
+export const TrackFormInputGroupItem = <TRadioValue extends string = string>({
+  label,
+  onInput,
+  onRadioValueChange,
+  radioOption,
+  radioValue,
+  value
+}: Props<TRadioValue>) => {
   const inputId = useId()
   const radioGroupName = useId()
-  const hasRadioOption = isValidArray(radioOption.itemList)
-  const [selectedRadioValue, setSelectedRadioValue] = useState(() =>
+  const hasRadioOption = radioOption.itemList.length > 0
+  const [uncontrolledSelectedRadioValue, setUncontrolledSelectedRadioValue] = useState(() =>
     hasRadioOption ? radioOption.itemList[0].value : ""
   )
+  const selectedRadioValue = isDefined(radioValue) ? radioValue : uncontrolledSelectedRadioValue
 
   return (
     <div className={styles.trackFormInput}>
@@ -43,7 +53,14 @@ export const TrackFormInputGroupItem = ({ label, onInput, radioOption, value }: 
                       className={styles.input}
                       id={radioInputId}
                       name={radioGroupName}
-                      onChange={() => setSelectedRadioValue(item.value)}
+                      onChange={() => {
+                        if (isDefined(onRadioValueChange)) {
+                          onRadioValueChange(item.value)
+                          return
+                        }
+
+                        setUncontrolledSelectedRadioValue(item.value)
+                      }}
                       type="radio"
                       value={item.value}
                     />

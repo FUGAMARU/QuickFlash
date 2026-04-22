@@ -2,28 +2,30 @@ import styles from "@/components/TrackForm/index.module.css"
 import { TrackFormInputGroup } from "@/components/TrackForm/TrackFormInputGroup"
 import { TrackFormMetaInfo } from "@/components/TrackForm/TrackFormMetaInfo"
 
-import type {
-  TrackFormAudioFileTagInfo,
-  TrackFormAudioFileMetaInfo
-} from "@/hooks/useTrackFormAudioFile"
+import type { ComponentProps } from "react"
 
-type Props = {
-  isPlaying: boolean
-  isPlaybackStarting: boolean
-  audioFilePath: string | undefined
-  info: TrackFormAudioFileMetaInfo
-  tagInfo: TrackFormAudioFileTagInfo
-  inputGroupResetSeed: number
-  onPlayButtonClick: () => void
-}
+type Props = Pick<
+  ComponentProps<typeof TrackFormInputGroup>,
+  "artistSeparatorRadioValue" | "onArtistSeparatorRadioValueChange"
+> &
+  Pick<
+    ComponentProps<typeof TrackFormMetaInfo>,
+    "info" | "isPlaybackStarting" | "isPlaying" | "onPlayButtonClick"
+  > & {
+    audioFilePath: string | undefined
+    tagInfo: ComponentProps<typeof TrackFormInputGroup>["initialValue"]
+    inputGroupResetSeed: number
+  }
 
 export const TrackForm = ({
   audioFilePath,
+  artistSeparatorRadioValue,
   info,
   tagInfo,
   inputGroupResetSeed,
   isPlaying,
   isPlaybackStarting,
+  onArtistSeparatorRadioValueChange,
   onPlayButtonClick
 }: Props) => {
   const inputGroupResetKey = [
@@ -46,7 +48,12 @@ export const TrackForm = ({
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
-        <TrackFormInputGroup key={inputGroupResetKey} initialValue={tagInfo} />
+        <TrackFormInputGroup
+          key={inputGroupResetKey}
+          artistSeparatorRadioValue={artistSeparatorRadioValue}
+          initialValue={tagInfo}
+          onArtistSeparatorRadioValueChange={onArtistSeparatorRadioValueChange}
+        />
       </div>
     </div>
   )

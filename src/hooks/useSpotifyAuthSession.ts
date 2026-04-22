@@ -1,7 +1,9 @@
 import { invoke } from "@tauri-apps/api/core"
 import { open } from "@tauri-apps/plugin-shell"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useLocalStorage } from "usehooks-ts"
 
+import { LOCAL_STORAGE_KEY } from "@/constants/storage"
 import { isDefined, isValidString } from "@/utils"
 import spotifyAuthConfig from "@config/spotifyAuthConfig.json"
 
@@ -10,7 +12,6 @@ const SPOTIFY_PKCE_REDIRECT_URI = spotifyAuthConfig.redirectUri
 const SPOTIFY_PKCE_SCOPES = spotifyAuthConfig.scopes
 const SPOTIFY_AUTHORIZATION_URL = "https://accounts.spotify.com/authorize"
 const SPOTIFY_CURRENT_USER_PROFILE_API_URL = "https://api.spotify.com/v1/me"
-const SPOTIFY_AUTH_SESSION_STORAGE_KEY = "auth-session"
 const SPOTIFY_AUTH_POLL_INTERVAL_MS = 1000
 const SPOTIFY_AUTH_POLL_MAX_ATTEMPTS = 60
 const SPOTIFY_ACCESS_TOKEN_REFRESH_BUFFER_SECONDS = 120
@@ -35,53 +36,33 @@ if (!isValidString(SPOTIFY_PKCE_SCOPES)) {
   throw new Error("spotifyAuthConfig.jsonのscopesが設定されていません")
 }
 
-const getStoredSpotifyAuthSession = (): SpotifyAuthSession | undefined => {
-  const storedAuthSession = localStorage.getItem(SPOTIFY_AUTH_SESSION_STORAGE_KEY)
-
-  if (!isValidString(storedAuthSession)) {
+const toSpotifyAuthSession = (
+  candidateAuthSession: Partial<SpotifyAuthSession> | undefined
+): SpotifyAuthSession | undefined => {
+  if (!isDefined(candidateAuthSession)) {
     return undefined
   }
 
-  try {
-    const parsedAuthSession = JSON.parse(storedAuthSession)
-
-    if (!isDefined(parsedAuthSession) || typeof parsedAuthSession !== "object") {
-      return undefined
-    }
-
-    const candidateAuthSession = parsedAuthSession as Partial<SpotifyAuthSession>
-
-    if (!isValidString(candidateAuthSession.accessToken)) {
-      return undefined
-    }
-
-    if (!isValidString(candidateAuthSession.refreshToken)) {
-      return undefined
-    }
-
-    if (
-      typeof candidateAuthSession.expiresAtEpochSeconds !== "number" ||
-      !Number.isFinite(candidateAuthSession.expiresAtEpochSeconds)
-    ) {
-      return undefined
-    }
-
-    return {
-      accessToken: candidateAuthSession.accessToken,
-      refreshToken: candidateAuthSession.refreshToken,
-      expiresAtEpochSeconds: candidateAuthSession.expiresAtEpochSeconds
-    }
-  } catch {
+  if (!isValidString(candidateAuthSession.accessToken)) {
     return undefined
   }
-}
 
-const saveSpotifyAuthSession = (authSession: SpotifyAuthSession) => {
-  localStorage.setItem(SPOTIFY_AUTH_SESSION_STORAGE_KEY, JSON.stringify(authSession))
-}
+  if (!isValidString(candidateAuthSession.refreshToken)) {
+    return undefined
+  }
 
-const clearStoredSpotifyAuthSession = () => {
-  localStorage.removeItem(SPOTIFY_AUTH_SESSION_STORAGE_KEY)
+  if (
+    typeof candidateAuthSession.expiresAtEpochSeconds !== "number" ||
+    !Number.isFinite(candidateAuthSession.expiresAtEpochSeconds)
+  ) {
+    return undefined
+  }
+
+  return {
+    accessToken: candidateAuthSession.accessToken,
+    refreshToken: candidateAuthSession.refreshToken,
+    expiresAtEpochSeconds: candidateAuthSession.expiresAtEpochSeconds
+  }
 }
 
 const fetchSpotifyCurrentUserEmail = async (
@@ -162,8 +143,14 @@ const isSpotifyAccessTokenRefreshRequired = (expiresAtEpochSeconds: number): boo
 }
 
 export const useSpotifyAuthSession = () => {
+  const [storedSpotifyAuthSession, setStoredSpotifyAuthSession, removeStoredSpotifyAuthSession] =
+    useLocalStorage<Partial<SpotifyAuthSession> | undefined>(
+      LOCAL_STORAGE_KEY.spotifyAuthSession,
+      undefined
+    )
+
   const [storedAuthSessionAtLaunch] = useState<SpotifyAuthSession | undefined>(() =>
-    getStoredSpotifyAuthSession()
+    toSpotifyAuthSession(storedSpotifyAuthSession)
   )
   const [accessToken, setAccessToken] = useState<string | undefined>()
   const [refreshToken, setRefreshToken] = useState<string | undefined>()
@@ -179,28 +166,31 @@ export const useSpotifyAuthSession = () => {
     setRefreshToken(undefined)
     setAccessTokenExpiresAtEpochSeconds(undefined)
     setUserEmailAddress(undefined)
-    clearStoredSpotifyAuthSession()
+    removeStoredSpotifyAuthSession()
 
     try {
       await invoke("clear_auth_session")
     } catch {
       // backend側のセッション削除失敗時も、UIはサインアウト済み状態を優先する
     }
-  }, [])
+  }, [removeStoredSpotifyAuthSession])
 
   const onSignoutButtonClick = useCallback(() => {
     clearAuthSession()
   }, [clearAuthSession])
 
-  const applyAuthSession = useCallback(async (authSession: SpotifyAuthSession) => {
-    setAccessToken(authSession.accessToken)
-    setRefreshToken(authSession.refreshToken)
-    setAccessTokenExpiresAtEpochSeconds(authSession.expiresAtEpochSeconds)
-    saveSpotifyAuthSession(authSession)
+  const applyAuthSession = useCallback(
+    async (authSession: SpotifyAuthSession) => {
+      setAccessToken(authSession.accessToken)
+      setRefreshToken(authSession.refreshToken)
+      setAccessTokenExpiresAtEpochSeconds(authSession.expiresAtEpochSeconds)
+      setStoredSpotifyAuthSession(authSession)
 
-    const fetchedUserEmailAddress = await fetchSpotifyCurrentUserEmail(authSession.accessToken)
-    setUserEmailAddress(fetchedUserEmailAddress)
-  }, [])
+      const fetchedUserEmailAddress = await fetchSpotifyCurrentUserEmail(authSession.accessToken)
+      setUserEmailAddress(fetchedUserEmailAddress)
+    },
+    [setStoredSpotifyAuthSession]
+  )
 
   const refreshSpotifyAccessToken = useCallback(
     async (nextRefreshToken: string) => {
@@ -310,7 +300,7 @@ export const useSpotifyAuthSession = () => {
 
       await applyAuthSession(authSession)
     } catch (error) {
-      alert(`Error: ${error}`)
+      alert(`エラーが発生しました: ${error}`)
       await clearAuthSession()
     } finally {
       setAuthInProgress(false)

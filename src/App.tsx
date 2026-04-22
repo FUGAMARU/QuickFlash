@@ -6,25 +6,28 @@ import { DropOverlay } from "@/components/DropOverlay"
 import { KeywordInput } from "@/components/KeywordInput"
 import { Signin } from "@/components/Signin"
 import { TrackForm } from "@/components/TrackForm"
+import { getArtistSeparatorText } from "@/components/TrackForm/index.helpers"
 import { TrackList } from "@/components/TrackList"
 import { UserInfoLabel } from "@/components/UserInfoLabel"
+import { useArtistSeparatorRadioValue } from "@/hooks/useArtistSeparatorRadioValue"
 import { useRightAreaMp3DropOverlay } from "@/hooks/useRightAreaMp3DropOverlay"
 import { useSpotifyAuthSession } from "@/hooks/useSpotifyAuthSession"
 import { useSpotifyTrackSearch } from "@/hooks/useSpotifyTrackSearch"
 import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
 import { isDefined, isValidString } from "@/utils"
 
-import type { TrackFormAudioFileTagInfo } from "@/hooks/useTrackFormAudioFile"
+import type { ComponentProps } from "react"
 
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
   const [audioFilePath, setAudioFilePath] = useState<string | undefined>()
   const [selectedTrackTagInfo, setSelectedTrackTagInfo] = useState<
-    | (TrackFormAudioFileTagInfo & {
+    | (ComponentProps<typeof TrackForm>["tagInfo"] & {
         audioFilePath: string | undefined
       })
     | undefined
   >()
+  const { artistSeparatorRadioValue, setArtistSeparatorRadioValue } = useArtistSeparatorRadioValue()
   const [trackFormInputResetSeed, setTrackFormInputResetSeed] = useState(0)
   const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay({
     onMp3Drop: setAudioFilePath
@@ -85,7 +88,7 @@ const App = () => {
             onItemClick={item => {
               setSelectedTrackTagInfo({
                 album: item.albumTitle,
-                artist: item.artistList.join(" / "),
+                artist: item.artistList.join(getArtistSeparatorText(artistSeparatorRadioValue)),
                 audioFilePath,
                 genre: item.genre,
                 release: item.release,
@@ -102,11 +105,13 @@ const App = () => {
           <ArtworkView artworkUrl={artworkUrl} />
         </div>
         <TrackForm
+          artistSeparatorRadioValue={artistSeparatorRadioValue}
           audioFilePath={audioFilePath}
           info={info}
           inputGroupResetSeed={trackFormInputResetSeed}
           isPlaybackStarting={isPlaybackStarting}
           isPlaying={isPlaying}
+          onArtistSeparatorRadioValueChange={setArtistSeparatorRadioValue}
           onPlayButtonClick={onPlayButtonClick}
           tagInfo={trackFormTagInfo}
         />
