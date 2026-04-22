@@ -32,7 +32,6 @@
         font-size: 48px;
         font-weight: 700;
         color: var(--color-dark);
-        text-box: trim-both cap alphabetic;
       }
     }
 
@@ -72,7 +71,6 @@
     font-family: Gabarito, sans-serif;
     font-size: 16px;
     font-weight: 700;
-    text-box: trim-both cap alphabetic;
   }
 
   > .logo {

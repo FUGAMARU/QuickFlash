@@ -68,7 +68,6 @@
   }
 
   > .text {
-    text-box: trim-both cap alphabetic;
     position: relative;
     z-index: 1;
     font-family: Outfit, sans-serif;

@@ -8,6 +8,10 @@ body {
   word-break: break-all;
 }
 
+:where(span, label, p) {
+  text-box: trim-both cap alphabetic;
+}
+
 span {
   -webkit-font-smoothing: antialiased;
 }

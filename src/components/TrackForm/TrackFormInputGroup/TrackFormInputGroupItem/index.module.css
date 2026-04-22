@@ -13,7 +13,6 @@
       font-size: 16px;
       font-weight: 700;
       color: var(--color-dark);
-      text-box: trim-both cap alphabetic;
     }
 
     > .option {
@@ -24,7 +23,6 @@
       > .label {
         font-size: 10px;
         color: var(--color-soft-dark);
-        text-box: trim-both cap alphabetic;
       }
 
       > .list {
@@ -102,6 +100,5 @@
     font-size: 16px;
     font-weight: 600;
     color: var(--color-soft-dark);
-    text-box: trim-both cap alphabetic;
   }
 }

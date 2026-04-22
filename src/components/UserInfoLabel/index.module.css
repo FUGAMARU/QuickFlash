@@ -9,7 +9,6 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--color-gray);
-    text-box: trim-both cap alphabetic;
   }
 
   > .user {
@@ -30,7 +29,6 @@
       font-weight: 700;
       color: var(--color-gray);
       text-transform: uppercase;
-      text-box: trim-both cap alphabetic;
     }
 
     > .signout {

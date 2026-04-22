@@ -3,7 +3,6 @@ import clsx from "clsx"
 import styles from "@/components/TrackList/TrackListItem/index.module.css"
 import { TrackListItemAlbumIcon } from "@/components/TrackList/TrackListItem/TrackListItemAlbumIcon"
 import { TrackListItemArtistIcon } from "@/components/TrackList/TrackListItem/TrackListItemArtistIcon"
-import { TrimmedText } from "@/components/TrimmedText"
 import { isValidArray } from "@/utils"
 
 type Props = {
@@ -43,17 +42,13 @@ export const TrackListItem = ({
               <span className={styles.icon}>
                 <TrackListItemArtistIcon />
               </span>
-              <TrimmedText className={clsx(styles.text, styles.maxOneLine)}>
-                {artistText}
-              </TrimmedText>
+              <span className={clsx(styles.text, styles.maxOneLine)}>{artistText}</span>
             </div>
             <div className={styles.detail}>
               <span className={styles.icon}>
                 <TrackListItemAlbumIcon />
               </span>
-              <TrimmedText className={clsx(styles.text, styles.maxOneLine)}>
-                {albumTitle}
-              </TrimmedText>
+              <span className={clsx(styles.text, styles.maxOneLine)}>{albumTitle}</span>
             </div>
           </div>
         </div>

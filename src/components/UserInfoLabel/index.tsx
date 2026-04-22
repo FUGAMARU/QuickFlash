@@ -1,4 +1,3 @@
-import { TrimmedText } from "@/components/TrimmedText"
 import styles from "@/components/UserInfoLabel/index.module.css"
 import { UserInfoLabelSignoutIcon } from "@/components/UserInfoLabel/UserInfoLabelSignoutIcon"
 
@@ -16,7 +15,7 @@ export const UserInfoLabel = ({
       <span className={styles.logo}>QuickFlash</span>
       <div className={styles.user}>
         <div className={styles.dot} />
-        <TrimmedText className={styles.label}>{emailAddress}</TrimmedText>
+        <span className={styles.label}>{emailAddress}</span>
         <button className={styles.signout} onClick={handleSignoutButtonClick} type="button">
           <UserInfoLabelSignoutIcon />
         </button>

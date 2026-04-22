@@ -18,7 +18,6 @@
     text-align: center;
     background-color: var(--color-gray);
     border-radius: 100px;
-    text-box: trim-both cap alphabetic;
   }
 
   > .text {
