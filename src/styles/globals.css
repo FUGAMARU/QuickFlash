@@ -8,7 +8,7 @@ body {
   word-break: break-all;
 }
 
-:where(span, label, p) {
+:where(label, p, span:not(:has(svg))) {
   text-box: trim-both cap alphabetic;
 }
 

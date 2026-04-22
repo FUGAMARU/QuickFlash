@@ -32,7 +32,7 @@ export const TrackFormMetaInfo = ({
           type="button"
         >
           {isPlaybackStarting ? (
-            <span aria-hidden="true" className={styles.loading}>
+            <span className={styles.loading}>
               <TrackFormMetaInfoLoadingIcon />
             </span>
           ) : isPlaying ? (

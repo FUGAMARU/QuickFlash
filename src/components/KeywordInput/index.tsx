@@ -11,7 +11,7 @@ type Props = {
 export const KeywordInput = ({ isLoading, value, onChange }: Props) => {
   return (
     <div className={styles.keywordInput}>
-      <span aria-hidden="true" className={styles.search}>
+      <span className={styles.search}>
         <KeywordInputSearchIcon />
       </span>
       <input
