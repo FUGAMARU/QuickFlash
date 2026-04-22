@@ -13,6 +13,7 @@ type Props = {
   audioFilePath: string | undefined
   info: TrackFormAudioFileMetaInfo
   tagInfo: TrackFormAudioFileTagInfo
+  inputGroupResetSeed: number
   onPlayButtonClick: () => void
 }
 
@@ -20,6 +21,7 @@ export const TrackForm = ({
   audioFilePath,
   info,
   tagInfo,
+  inputGroupResetSeed,
   isPlaying,
   isPlaybackStarting,
   onPlayButtonClick
@@ -31,7 +33,8 @@ export const TrackForm = ({
     tagInfo.album,
     tagInfo.genre,
     tagInfo.release,
-    tagInfo.trackNumber
+    tagInfo.trackNumber,
+    inputGroupResetSeed
   ].join("\n")
 
   return (

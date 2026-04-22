@@ -11,6 +11,9 @@ type Props = {
   title: string
   artistList: Array<string>
   albumTitle: string
+  genre: string
+  release: string
+  trackNumber: string
 }
 
 export const TrackListItem = ({

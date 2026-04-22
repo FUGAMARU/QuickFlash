@@ -12,11 +12,20 @@ import { useRightAreaMp3DropOverlay } from "@/hooks/useRightAreaMp3DropOverlay"
 import { useSpotifyAuthSession } from "@/hooks/useSpotifyAuthSession"
 import { useSpotifyTrackSearch } from "@/hooks/useSpotifyTrackSearch"
 import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
-import { isValidString } from "@/utils"
+import { isDefined, isValidString } from "@/utils"
+
+import type { TrackFormAudioFileTagInfo } from "@/hooks/useTrackFormAudioFile"
 
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
   const [audioFilePath, setAudioFilePath] = useState<string | undefined>()
+  const [selectedTrackTagInfo, setSelectedTrackTagInfo] = useState<
+    | (TrackFormAudioFileTagInfo & {
+        audioFilePath: string | undefined
+      })
+    | undefined
+  >()
+  const [trackFormInputResetSeed, setTrackFormInputResetSeed] = useState(0)
   const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay({
     onMp3Drop: setAudioFilePath
   })
@@ -34,6 +43,18 @@ const App = () => {
   })
   const { artworkUrl, info, tagInfo, isPlaying, isPlaybackStarting, onPlayButtonClick } =
     useTrackFormAudioFile({ audioFilePath })
+  const isSelectedTrackTagInfoActive =
+    isDefined(selectedTrackTagInfo) && selectedTrackTagInfo.audioFilePath === audioFilePath
+  const trackFormTagInfo = isSelectedTrackTagInfoActive
+    ? {
+        album: selectedTrackTagInfo.album,
+        artist: selectedTrackTagInfo.artist,
+        genre: selectedTrackTagInfo.genre,
+        release: selectedTrackTagInfo.release,
+        title: selectedTrackTagInfo.title,
+        trackNumber: selectedTrackTagInfo.trackNumber
+      }
+    : tagInfo
 
   if (isAuthBootstrapInProgress) {
     return null
@@ -59,7 +80,21 @@ const App = () => {
         </div>
         <hr className={styles.divider} />
         <div className={styles.list}>
-          <TrackList itemList={trackList} />
+          <TrackList
+            itemList={trackList}
+            onItemClick={item => {
+              setSelectedTrackTagInfo({
+                album: item.albumTitle,
+                artist: item.artistList.join(" / "),
+                audioFilePath,
+                genre: item.genre,
+                release: item.release,
+                title: item.title,
+                trackNumber: item.trackNumber
+              })
+              setTrackFormInputResetSeed(current => current + 1)
+            }}
+          />
         </div>
       </aside>
       <div className={styles.right} {...rightAreaDragProps}>
@@ -69,10 +104,11 @@ const App = () => {
         <TrackForm
           audioFilePath={audioFilePath}
           info={info}
+          inputGroupResetSeed={trackFormInputResetSeed}
           isPlaybackStarting={isPlaybackStarting}
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
-          tagInfo={tagInfo}
+          tagInfo={trackFormTagInfo}
         />
         {isFileDragOver && (
           <div className={styles.overlay}>

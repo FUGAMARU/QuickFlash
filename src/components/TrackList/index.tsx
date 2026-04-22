@@ -11,9 +11,10 @@ import type { ComponentProps } from "react"
 
 type Props = {
   itemList: Array<ComponentProps<typeof TrackListItem>>
+  onItemClick: (item: ComponentProps<typeof TrackListItem>) => void
 }
 
-export const TrackList = ({ itemList }: Props) => {
+export const TrackList = ({ itemList, onItemClick }: Props) => {
   const hoverDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const initialPlacementFrameRef = useRef<number | undefined>(undefined)
   const itemWrapperRefList = useRef<Array<HTMLDivElement | null>>([])
@@ -92,6 +93,7 @@ export const TrackList = ({ itemList }: Props) => {
     clearHoverDebounceTimer()
     setIsBgFixed(true)
     updateHoveredBgPosition(index)
+    onItemClick(itemList[index])
   }
 
   const handleTrackListMouseLeave = () => {

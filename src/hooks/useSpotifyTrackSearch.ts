@@ -16,9 +16,11 @@ type SpotifyTrackItem = {
   album?: {
     images?: Array<{ url?: string }>
     name?: string
+    release_date?: string
   }
   artists?: Array<{ name?: string }>
   name?: string
+  track_number?: number
 }
 
 type TrackListItemComponentProps = ComponentProps<typeof TrackListItem>
@@ -65,6 +67,13 @@ const toTrackListItem = async (
 
   const trackTitle = isValidString(spotifyTrack.name) ? spotifyTrack.name : "-"
   const albumTitle = isValidString(spotifyTrack.album?.name) ? spotifyTrack.album.name : "-"
+  const release = isValidString(spotifyTrack.album?.release_date)
+    ? spotifyTrack.album.release_date.split("-")[0]
+    : ""
+  const trackNumber =
+    typeof spotifyTrack.track_number === "number" && spotifyTrack.track_number > 0
+      ? `${spotifyTrack.track_number}`
+      : ""
   const artistNameList = isValidArray(spotifyTrack.artists)
     ? spotifyTrack.artists.map(artist => artist.name).filter(isValidString)
     : []
@@ -75,6 +84,9 @@ const toTrackListItem = async (
     artistList: artistNameList,
     artworkThemeColor,
     artworkUrl,
+    genre: "",
+    release,
+    trackNumber,
     title: trackTitle
   }
 }
