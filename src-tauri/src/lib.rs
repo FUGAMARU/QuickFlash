@@ -18,6 +18,22 @@ struct AudioFileMetaInfo {
     quality_text: String,
     duration_text: String,
     size_text: String,
+    title_text: String,
+    artist_text: String,
+    album_text: String,
+    genre_text: String,
+    release_text: String,
+    track_number_text: String,
+}
+
+#[derive(Default)]
+struct AudioFileTagInfo {
+    title_text: String,
+    artist_text: String,
+    album_text: String,
+    genre_text: String,
+    release_text: String,
+    track_number_text: String,
 }
 
 struct Mp3FrameHeaderInfo {
@@ -60,6 +76,7 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
         .map_err(|e| format!("音源ファイルの再生時間取得に失敗しました: {}", e))?;
     let frame_header_info = read_mp3_frame_header_info(&file_path)?;
     let artwork_data_url = read_audio_file_artwork_data_url(&file_path).unwrap_or_default();
+    let tag_info = read_audio_file_tag_info(&file_path);
 
     Ok(AudioFileMetaInfo {
         artwork_data_url,
@@ -70,12 +87,36 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
         ),
         duration_text: format_duration(duration),
         size_text: format_file_size(file_size),
+        title_text: tag_info.title_text,
+        artist_text: tag_info.artist_text,
+        album_text: tag_info.album_text,
+        genre_text: tag_info.genre_text,
+        release_text: tag_info.release_text,
+        track_number_text: tag_info.track_number_text,
     })
 }
 
 #[tauri::command]
 fn read_file_bytes(file_path: String) -> Result<Vec<u8>, String> {
     read(&file_path).map_err(|e| format!("ファイルの読み込みに失敗しました: {}", e))
+}
+
+fn read_audio_file_tag_info(file_path: &str) -> AudioFileTagInfo {
+    let Some(tag) = Tag::read_from_path(file_path).ok() else {
+        return AudioFileTagInfo::default();
+    };
+
+    AudioFileTagInfo {
+        title_text: tag.title().unwrap_or_default().to_string(),
+        artist_text: tag.artist().unwrap_or_default().to_string(),
+        album_text: tag.album().unwrap_or_default().to_string(),
+        genre_text: tag.genre().unwrap_or_default().to_string(),
+        release_text: tag.year().map(|year| year.to_string()).unwrap_or_default(),
+        track_number_text: tag
+            .track()
+            .map(|track_number| track_number.to_string())
+            .unwrap_or_default(),
+    }
 }
 
 fn read_audio_file_artwork_data_url(file_path: &str) -> Option<String> {

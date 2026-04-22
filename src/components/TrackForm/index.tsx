@@ -2,16 +2,38 @@ import styles from "@/components/TrackForm/index.module.css"
 import { TrackFormInputGroup } from "@/components/TrackForm/TrackFormInputGroup"
 import { TrackFormMetaInfo } from "@/components/TrackForm/TrackFormMetaInfo"
 
-import type { TrackFormAudioFileMetaInfo } from "@/hooks/useTrackFormAudioFile"
+import type {
+  TrackFormAudioFileTagInfo,
+  TrackFormAudioFileMetaInfo
+} from "@/hooks/useTrackFormAudioFile"
 
 type Props = {
   isPlaying: boolean
   isPlaybackStarting: boolean
+  audioFilePath: string | undefined
   info: TrackFormAudioFileMetaInfo
+  tagInfo: TrackFormAudioFileTagInfo
   onPlayButtonClick: () => void
 }
 
-export const TrackForm = ({ info, isPlaying, isPlaybackStarting, onPlayButtonClick }: Props) => {
+export const TrackForm = ({
+  audioFilePath,
+  info,
+  tagInfo,
+  isPlaying,
+  isPlaybackStarting,
+  onPlayButtonClick
+}: Props) => {
+  const inputGroupResetKey = [
+    audioFilePath,
+    tagInfo.title,
+    tagInfo.artist,
+    tagInfo.album,
+    tagInfo.genre,
+    tagInfo.release,
+    tagInfo.trackNumber
+  ].join("\n")
+
   return (
     <div className={styles.trackForm}>
       <div className={styles.inner}>
@@ -21,7 +43,7 @@ export const TrackForm = ({ info, isPlaying, isPlaybackStarting, onPlayButtonCli
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
-        <TrackFormInputGroup />
+        <TrackFormInputGroup key={inputGroupResetKey} initialValue={tagInfo} />
       </div>
     </div>
   )

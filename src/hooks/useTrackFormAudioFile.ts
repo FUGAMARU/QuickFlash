@@ -8,47 +8,70 @@ type TrackFormAudioFileMetaInfoResponse = {
   durationText: string
   qualityText: string
   sizeText: string
+  titleText: string
+  artistText: string
+  albumText: string
+  genreText: string
+  releaseText: string
+  trackNumberText: string
 }
 
 export type TrackFormAudioFileMetaInfo = TrackFormAudioFileMetaInfoResponse & {
   fileName: string
 }
 
+export type TrackFormAudioFileTagInfo = {
+  title: string
+  artist: string
+  album: string
+  genre: string
+  release: string
+  trackNumber: string
+}
+
 const EMPTY_AUDIO_META_INFO = {
   artworkDataUrl: "",
-  durationText: "",
-  qualityText: "",
-  sizeText: ""
+  durationText: "0:00",
+  qualityText: "0kHz / 0kbps",
+  sizeText: "0.0MB",
+  titleText: "",
+  artistText: "",
+  albumText: "",
+  genreText: "",
+  releaseText: "",
+  trackNumberText: ""
 } as const satisfies TrackFormAudioFileMetaInfoResponse
 
-const DUMMY_AUDIO_META_INFO = {
-  artworkDataUrl: "",
-  durationText: "03:42",
-  qualityText: "44.1kHz / 320kbps",
-  sizeText: "8.7MB"
-} as const satisfies TrackFormAudioFileMetaInfoResponse
-
-export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string }) => {
+export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string | undefined }) => {
   const isTauriEnvironment = isTauri()
   const audioPlayRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedOnceRef = useRef(false)
   const isPlaybackPendingRef = useRef(false)
-  const [metaInfo, setMetaInfo] = useState<TrackFormAudioFileMetaInfoResponse>(() =>
-    isTauriEnvironment ? { ...EMPTY_AUDIO_META_INFO } : { ...DUMMY_AUDIO_META_INFO }
-  )
+  const [metaInfo, setMetaInfo] = useState<TrackFormAudioFileMetaInfoResponse>({
+    ...EMPTY_AUDIO_META_INFO
+  })
   const [isPlaying, setIsPlaying] = useState(false)
-  const [playbackStartingFilePath, setPlaybackStartingFilePath] = useState<string | null>(null)
+  const [playbackStartingFilePath, setPlaybackStartingFilePath] = useState<string | undefined>()
 
   const fileName = isValidString(audioFilePath) ? getFilenameFromPath(audioFilePath) : ""
-  const isPlaybackStarting = isValidString(audioFilePath) && playbackStartingFilePath === audioFilePath
+  const isPlaybackStarting =
+    isValidString(audioFilePath) && playbackStartingFilePath === audioFilePath
   const info = {
     ...metaInfo,
     fileName
   } satisfies TrackFormAudioFileMetaInfo
+  const tagInfo = {
+    title: metaInfo.titleText,
+    artist: metaInfo.artistText,
+    album: metaInfo.albumText,
+    genre: metaInfo.genreText,
+    release: metaInfo.releaseText,
+    trackNumber: metaInfo.trackNumberText
+  } satisfies TrackFormAudioFileTagInfo
 
   const clearPlaybackStartingState = () => {
     isPlaybackPendingRef.current = false
-    setPlaybackStartingFilePath(null)
+    setPlaybackStartingFilePath(undefined)
   }
 
   const handlePlayButtonClick = () => {
@@ -96,7 +119,7 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
     }
 
     isPlaybackPendingRef.current = true
-    setPlaybackStartingFilePath(hasPlayedOnceRef.current ? null : audioFilePath)
+    setPlaybackStartingFilePath(hasPlayedOnceRef.current ? undefined : audioFilePath)
 
     audio.play().catch(() => {
       clearPlaybackStartingState()
@@ -143,6 +166,7 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
   return {
     artworkUrl: info.artworkDataUrl,
     info,
+    tagInfo,
     isPlaying,
     isPlaybackStarting,
     onPlayButtonClick: handlePlayButtonClick

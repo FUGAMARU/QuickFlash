@@ -16,7 +16,10 @@ import { isValidString } from "@/utils"
 
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
-  const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay()
+  const [audioFilePath, setAudioFilePath] = useState<string | undefined>()
+  const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay({
+    onMp3Drop: setAudioFilePath
+  })
   const {
     accessToken,
     authInProgress,
@@ -29,10 +32,8 @@ const App = () => {
     accessToken,
     searchKeyword
   })
-  const { artworkUrl, info, isPlaying, isPlaybackStarting, onPlayButtonClick } =
-    useTrackFormAudioFile({
-      audioFilePath: import.meta.env.VITE_DEV_AUDIO_FILE_PATH
-    })
+  const { artworkUrl, info, tagInfo, isPlaying, isPlaybackStarting, onPlayButtonClick } =
+    useTrackFormAudioFile({ audioFilePath })
 
   if (isAuthBootstrapInProgress) {
     return null
@@ -66,10 +67,12 @@ const App = () => {
           <ArtworkView artworkUrl={artworkUrl} />
         </div>
         <TrackForm
+          audioFilePath={audioFilePath}
           info={info}
           isPlaybackStarting={isPlaybackStarting}
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
+          tagInfo={tagInfo}
         />
         {isFileDragOver && (
           <div className={styles.overlay}>

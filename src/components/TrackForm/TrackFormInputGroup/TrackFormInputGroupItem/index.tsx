@@ -9,20 +9,13 @@ type LabelValuePair = {
 }
 
 type Props = LabelValuePair & {
-  placeholder: string
   onInput: (value: string) => void
   radioOption: Pick<LabelValuePair, "label"> & {
     itemList: Array<LabelValuePair>
   }
 }
 
-export const TrackFormInputGroupItem = ({
-  label,
-  placeholder,
-  onInput,
-  radioOption,
-  value
-}: Props) => {
+export const TrackFormInputGroupItem = ({ label, onInput, radioOption, value }: Props) => {
   const inputId = useId()
   const radioGroupName = useId()
   const hasRadioOption = isValidArray(radioOption.itemList)
@@ -67,7 +60,6 @@ export const TrackFormInputGroupItem = ({
         className={styles.input}
         id={inputId}
         onInput={e => onInput(e.currentTarget.value)}
-        placeholder={placeholder}
         type="text"
         value={value}
       />

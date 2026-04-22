@@ -8,6 +8,7 @@ import { isDefined, isValidString } from "@/utils"
 import type { ComponentProps, DragEvent } from "react"
 
 const UNSUPPORTED_MP3_DROP_MESSAGE = "mp3ファイルのみ対応しています"
+const FILE_PATH_RESOLVE_FAILED_MESSAGE = "ファイルパスの取得に失敗しました"
 const MP3_MIME_TYPE_SET = new Set<string>(["audio/mpeg", "audio/mp3", "audio/x-mp3"])
 let inFlightMagikaClient: Promise<Magika> | undefined
 
@@ -38,7 +39,7 @@ const isMp3BytesByMagika = async (fileBytes: Uint8Array) => {
   return detectionResult.prediction.output.label === "mp3"
 }
 
-const hasMp3WithMagikaFallback = async <Target>({
+const findFirstMp3TargetWithMagikaFallback = async <Target>({
   fallbackIsMp3,
   readBytes,
   targetList
@@ -59,18 +60,24 @@ const hasMp3WithMagikaFallback = async <Target>({
     })
   )
 
-  return mp3DetectionList.some(isMp3 => isMp3)
+  const firstMp3Index = mp3DetectionList.findIndex(isMp3 => isMp3)
+
+  if (firstMp3Index < 0) {
+    return undefined
+  }
+
+  return targetList[firstMp3Index]
 }
 
-const hasMp3File = (fileList: Array<File>) =>
-  hasMp3WithMagikaFallback({
+const findDroppedMp3File = (fileList: Array<File>) =>
+  findFirstMp3TargetWithMagikaFallback({
     fallbackIsMp3: file => isMp3MimeType(file.type) || isMp3FileName(file.name),
     readBytes: async file => new Uint8Array(await file.arrayBuffer()),
     targetList: fileList
   })
 
-const hasMp3Path = (filePathList: Array<string>) =>
-  hasMp3WithMagikaFallback({
+const findDroppedMp3Path = (filePathList: Array<string>) =>
+  findFirstMp3TargetWithMagikaFallback({
     fallbackIsMp3: filePath => isMp3FileName(filePath),
     readBytes: async filePath => {
       const rawFileBytes = await invoke<Array<number>>("read_file_bytes", {
@@ -82,7 +89,21 @@ const hasMp3Path = (filePathList: Array<string>) =>
     targetList: filePathList
   })
 
-export const useRightAreaMp3DropOverlay = () => {
+const getFilePathFromDroppedFile = (file: File) => {
+  const filePath = Reflect.get(file, "path") as string | null | undefined
+
+  if (!isValidString(filePath)) {
+    return undefined
+  }
+
+  return filePath
+}
+
+export const useRightAreaMp3DropOverlay = ({
+  onMp3Drop
+}: {
+  onMp3Drop: (filePath: string) => void
+}) => {
   const isTauriEnvironment = isTauri()
   const [isFileDragOver, setIsFileDragOver] = useState(false)
   const rightDragCounterRef = useRef(0)
@@ -102,9 +123,24 @@ export const useRightAreaMp3DropOverlay = () => {
     }
 
     void (async () => {
-      const isMp3Detected = await hasMp3File(fileList)
+      const droppedMp3File = await findDroppedMp3File(fileList)
 
-      notifyWhenNotMp3(isMp3Detected)
+      if (!isDefined(droppedMp3File)) {
+        notifyWhenNotMp3(false)
+        return
+      }
+
+      const droppedMp3Path = getFilePathFromDroppedFile(droppedMp3File)
+
+      if (!isValidString(droppedMp3Path)) {
+        if (!isTauriEnvironment) {
+          alert(FILE_PATH_RESOLVE_FAILED_MESSAGE)
+        }
+
+        return
+      }
+
+      onMp3Drop(droppedMp3Path)
     })()
   }
 
@@ -124,9 +160,14 @@ export const useRightAreaMp3DropOverlay = () => {
       }
 
       void (async () => {
-        const isMp3Detected = await hasMp3Path(filePathList)
+        const droppedMp3Path = await findDroppedMp3Path(filePathList)
 
-        notifyWhenNotMp3(isMp3Detected)
+        if (!isValidString(droppedMp3Path)) {
+          notifyWhenNotMp3(false)
+          return
+        }
+
+        onMp3Drop(droppedMp3Path)
       })()
     }
 
@@ -171,7 +212,7 @@ export const useRightAreaMp3DropOverlay = () => {
         unlistenDragDropEvent()
       }
     }
-  }, [isTauriEnvironment])
+  }, [isTauriEnvironment, onMp3Drop])
 
   const handleRightDragEnter = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()

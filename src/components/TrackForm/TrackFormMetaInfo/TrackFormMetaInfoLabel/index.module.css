@@ -21,7 +21,9 @@
   }
 
   > .text {
+    display: block;
     max-width: 100%;
+    min-height: 1.3em;
     font-size: 12px;
     line-height: 1.3;
 
