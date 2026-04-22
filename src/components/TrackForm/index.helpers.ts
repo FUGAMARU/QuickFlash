@@ -5,14 +5,17 @@ export const ARTIST_SEPARATOR_RADIO_OPTION = {
   itemList: [
     {
       label: "/",
+      separatorText: " / ",
       value: "slash"
     },
     {
       label: ",",
+      separatorText: ", ",
       value: "comma"
     },
     {
       label: "・",
+      separatorText: "・",
       value: "dot"
     }
   ]
@@ -28,7 +31,7 @@ export const isArtistSeparatorRadioValue = (value: string): value is ArtistSepar
 export const getArtistSeparatorText = (radioValue: ArtistSeparatorRadioValue) => {
   for (const item of ARTIST_SEPARATOR_RADIO_OPTION.itemList) {
     if (item.value === radioValue) {
-      return item.label
+      return item.separatorText
     }
   }
 
