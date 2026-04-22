@@ -29,8 +29,15 @@ const App = () => {
   >()
   const { artistSeparatorRadioValue, setArtistSeparatorRadioValue } = useArtistSeparatorRadioValue()
   const [trackFormInputResetSeed, setTrackFormInputResetSeed] = useState(0)
+
+  const handleMp3Drop = (nextAudioFilePath: string) => {
+    setAudioFilePath(nextAudioFilePath)
+    setSelectedTrackTagInfo(undefined)
+    setTrackFormInputResetSeed(current => current + 1)
+  }
+
   const { isFileDragOver, rightAreaDragProps } = useRightAreaMp3DropOverlay({
-    onMp3Drop: setAudioFilePath
+    onMp3Drop: handleMp3Drop
   })
   const {
     accessToken,
