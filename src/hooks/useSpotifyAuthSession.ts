@@ -1,9 +1,9 @@
-import spotifyAuthConfig from "@config/spotifyAuthConfig.json"
 import { invoke } from "@tauri-apps/api/core"
 import { open } from "@tauri-apps/plugin-shell"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { isDefined, isValidString } from "@/utils"
+import spotifyAuthConfig from "@config/spotifyAuthConfig.json"
 
 const SPOTIFY_PKCE_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
 const SPOTIFY_PKCE_REDIRECT_URI = spotifyAuthConfig.redirectUri
@@ -155,6 +155,12 @@ const requestRefreshedSpotifySession = async (
   }
 }
 
+const isSpotifyAccessTokenRefreshRequired = (expiresAtEpochSeconds: number): boolean => {
+  const currentEpochSeconds = Math.floor(Date.now() / 1000)
+
+  return expiresAtEpochSeconds - SPOTIFY_ACCESS_TOKEN_REFRESH_BUFFER_SECONDS <= currentEpochSeconds
+}
+
 export const useSpotifyAuthSession = () => {
   const [storedAuthSessionAtLaunch] = useState<SpotifyAuthSession | undefined>(() =>
     getStoredSpotifyAuthSession()
@@ -231,7 +237,13 @@ export const useSpotifyAuthSession = () => {
 
         if (!isDisposed) {
           setAuthInProgress(true)
-          await refreshSpotifyAccessToken(bootstrapSession.refreshToken)
+
+          if (isSpotifyAccessTokenRefreshRequired(bootstrapSession.expiresAtEpochSeconds)) {
+            await refreshSpotifyAccessToken(bootstrapSession.refreshToken)
+            return
+          }
+
+          await applyAuthSession(bootstrapSession)
         }
       } finally {
         if (!isDisposed) {
@@ -246,7 +258,7 @@ export const useSpotifyAuthSession = () => {
     return () => {
       isDisposed = true
     }
-  }, [refreshSpotifyAccessToken, storedAuthSessionAtLaunch])
+  }, [applyAuthSession, refreshSpotifyAccessToken, storedAuthSessionAtLaunch])
 
   useEffect(() => {
     if (!isValidString(refreshToken) || !isDefined(accessTokenExpiresAtEpochSeconds)) {
