@@ -1,9 +1,12 @@
 mod pkce;
 
 use base64::{engine::general_purpose::STANDARD, Engine};
-use id3::{Tag, TagLike};
+use id3::{
+    frame::{Content, Frame, Picture, PictureType},
+    Tag, TagLike,
+};
 use pkce::{start_server, AppState};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     fs::{create_dir_all, metadata, read, File},
     io::{Read, Seek, SeekFrom},
@@ -34,6 +37,18 @@ struct AudioFileTagInfo {
     genre_text: String,
     release_text: String,
     track_number_text: String,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AudioFileTagWriteInfo {
+    title: String,
+    artist: String,
+    album: String,
+    genre: String,
+    release: String,
+    track_number: String,
+    artwork_url: Option<String>,
 }
 
 struct Mp3FrameHeaderInfo {
@@ -97,6 +112,34 @@ fn read_audio_file_meta_info(file_path: String) -> Result<AudioFileMetaInfo, Str
 }
 
 #[tauri::command]
+async fn write_audio_file_tag_info(
+    file_path: String,
+    tag_info: AudioFileTagWriteInfo,
+) -> Result<(), String> {
+    let mut tag = Tag::read_from_path(&file_path).unwrap_or_else(|_| Tag::new());
+
+    set_tag_text_frame(&mut tag, "TIT2", &tag_info.title);
+    set_tag_text_frame(&mut tag, "TPE1", &tag_info.artist);
+    set_tag_text_frame(&mut tag, "TALB", &tag_info.album);
+    set_tag_text_frame(&mut tag, "TCON", &tag_info.genre);
+    set_tag_text_frame(&mut tag, "TDRC", &tag_info.release);
+    set_tag_text_frame(&mut tag, "TRCK", &tag_info.track_number);
+
+    if let Some(artwork_url) = tag_info.artwork_url.as_deref() {
+        let normalized_artwork_url = artwork_url.trim();
+
+        if !normalized_artwork_url.is_empty() {
+            let (mime_type, artwork_data) = read_artwork_by_url(normalized_artwork_url).await?;
+
+            set_tag_artwork_frame(&mut tag, mime_type, artwork_data);
+        }
+    }
+
+    tag.write_to_path(&file_path, id3::Version::Id3v24)
+        .map_err(|e| format!("音源ファイルへのタグ書き込みに失敗しました: {}", e))
+}
+
+#[tauri::command]
 fn read_file_bytes(file_path: String) -> Result<Vec<u8>, String> {
     read(&file_path).map_err(|e| format!("ファイルの読み込みに失敗しました: {}", e))
 }
@@ -111,12 +154,90 @@ fn read_audio_file_tag_info(file_path: &str) -> AudioFileTagInfo {
         artist_text: tag.artist().unwrap_or_default().to_string(),
         album_text: tag.album().unwrap_or_default().to_string(),
         genre_text: tag.genre().unwrap_or_default().to_string(),
-        release_text: tag.year().map(|year| year.to_string()).unwrap_or_default(),
-        track_number_text: tag
-            .track()
-            .map(|track_number| track_number.to_string())
+        release_text: read_tag_text_frame(&tag, "TDRC")
+            .or_else(|| tag.year().map(|year| year.to_string()))
+            .unwrap_or_default(),
+        track_number_text: read_tag_text_frame(&tag, "TRCK")
+            .or_else(|| tag.track().map(|track_number| track_number.to_string()))
             .unwrap_or_default(),
     }
+}
+
+fn read_tag_text_frame(tag: &Tag, frame_id: &str) -> Option<String> {
+    tag.get(frame_id)
+        .and_then(|frame| frame.content().text())
+        .map(|text| text.to_string())
+}
+
+fn set_tag_text_frame(tag: &mut Tag, frame_id: &str, value: &str) {
+    let normalized_value = value.trim();
+
+    if normalized_value.is_empty() {
+        tag.remove(frame_id);
+        return;
+    }
+
+    tag.set_text(frame_id, normalized_value);
+}
+
+fn set_tag_artwork_frame(tag: &mut Tag, mime_type: String, artwork_data: Vec<u8>) {
+    let _ = tag.remove("APIC");
+
+    tag.add_frame(Frame::with_content(
+        "APIC",
+        Content::Picture(Picture {
+            mime_type,
+            picture_type: PictureType::CoverFront,
+            description: String::new(),
+            data: artwork_data,
+        }),
+    ));
+}
+
+async fn read_artwork_by_url(artwork_url: &str) -> Result<(String, Vec<u8>), String> {
+    let response = reqwest::get(artwork_url)
+        .await
+        .map_err(|e| format!("アートワーク画像の取得に失敗しました: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!(
+            "アートワーク画像の取得に失敗しました: status={}",
+            response.status()
+        ));
+    }
+
+    let response_content_type = response
+        .headers()
+        .get(reqwest::header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok())
+        .map(|content_type| content_type.to_string());
+    let artwork_data = response
+        .bytes()
+        .await
+        .map_err(|e| format!("アートワーク画像の読み込みに失敗しました: {}", e))?
+        .to_vec();
+
+    if artwork_data.is_empty() {
+        return Err("アートワーク画像の内容が空でした".to_string());
+    }
+
+    let mime_type = if let Some(raw_content_type) = response_content_type {
+        let normalized_content_type = raw_content_type
+            .split(';')
+            .next()
+            .map(str::trim)
+            .unwrap_or_default();
+
+        if normalized_content_type.is_empty() {
+            detect_image_mime_type(&artwork_data).to_string()
+        } else {
+            normalized_content_type.to_string()
+        }
+    } else {
+        detect_image_mime_type(&artwork_data).to_string()
+    };
+
+    Ok((mime_type, artwork_data))
 }
 
 fn read_audio_file_artwork_data_url(file_path: &str) -> Option<String> {
@@ -320,6 +441,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             read_audio_file_meta_info,
+            write_audio_file_tag_info,
             read_file_bytes,
             read_mp3_title,
             pkce::start_spotify_auth,

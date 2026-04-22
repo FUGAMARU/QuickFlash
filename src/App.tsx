@@ -21,8 +21,10 @@ import type { ComponentProps } from "react"
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
   const [audioFilePath, setAudioFilePath] = useState<string | undefined>()
+  const [trackFormAudioFileRefreshSeed, setTrackFormAudioFileRefreshSeed] = useState(0)
   const [selectedTrackTagInfo, setSelectedTrackTagInfo] = useState<
     | (ComponentProps<typeof TrackForm>["tagInfo"] & {
+        artworkUrl: string
         audioFilePath: string | undefined
       })
     | undefined
@@ -52,9 +54,18 @@ const App = () => {
     searchKeyword
   })
   const { artworkUrl, info, tagInfo, isPlaying, isPlaybackStarting, onPlayButtonClick } =
-    useTrackFormAudioFile({ audioFilePath })
+    useTrackFormAudioFile({
+      audioFilePath,
+      refreshSeed: trackFormAudioFileRefreshSeed
+    })
   const isSelectedTrackTagInfoActive =
     isDefined(selectedTrackTagInfo) && selectedTrackTagInfo.audioFilePath === audioFilePath
+  const selectedTrackArtworkUrl = isSelectedTrackTagInfoActive
+    ? selectedTrackTagInfo.artworkUrl
+    : undefined
+  const activeArtworkUrl = isValidString(selectedTrackArtworkUrl)
+    ? selectedTrackArtworkUrl
+    : artworkUrl
   const trackFormTagInfo = isSelectedTrackTagInfoActive
     ? {
         album: selectedTrackTagInfo.album,
@@ -65,6 +76,11 @@ const App = () => {
         trackNumber: selectedTrackTagInfo.trackNumber
       }
     : tagInfo
+
+  const handleTrackFormFlashComplete = () => {
+    setSelectedTrackTagInfo(undefined)
+    setTrackFormAudioFileRefreshSeed(current => current + 1)
+  }
 
   if (isAuthBootstrapInProgress) {
     return null
@@ -96,6 +112,7 @@ const App = () => {
               setSelectedTrackTagInfo({
                 album: item.albumTitle,
                 artist: item.artistList.join(getArtistSeparatorText(artistSeparatorRadioValue)),
+                artworkUrl: item.artworkUrl,
                 audioFilePath,
                 genre: item.genre,
                 release: item.release,
@@ -109,16 +126,18 @@ const App = () => {
       </aside>
       <div className={styles.right} {...rightAreaDragProps}>
         <div className={styles.artwork}>
-          <ArtworkView artworkUrl={artworkUrl} />
+          <ArtworkView artworkUrl={activeArtworkUrl} />
         </div>
         <TrackForm
           artistSeparatorRadioValue={artistSeparatorRadioValue}
           audioFilePath={audioFilePath}
+          flashArtworkUrl={selectedTrackArtworkUrl}
           info={info}
           inputGroupResetSeed={trackFormInputResetSeed}
           isPlaybackStarting={isPlaybackStarting}
           isPlaying={isPlaying}
           onArtistSeparatorRadioValueChange={setArtistSeparatorRadioValue}
+          onFlashComplete={handleTrackFormFlashComplete}
           onPlayButtonClick={onPlayButtonClick}
           tagInfo={trackFormTagInfo}
         />

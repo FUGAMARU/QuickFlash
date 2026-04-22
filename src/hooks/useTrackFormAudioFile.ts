@@ -42,7 +42,13 @@ const EMPTY_AUDIO_META_INFO = {
   trackNumberText: ""
 } as const satisfies TrackFormAudioFileMetaInfoResponse
 
-export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string | undefined }) => {
+export const useTrackFormAudioFile = ({
+  audioFilePath,
+  refreshSeed
+}: {
+  audioFilePath: string | undefined
+  refreshSeed: number
+}) => {
   const isTauriEnvironment = isTauri()
   const audioPlayRef = useRef<HTMLAudioElement | null>(null)
   const hasPlayedOnceRef = useRef(false)
@@ -161,7 +167,7 @@ export const useTrackFormAudioFile = ({ audioFilePath }: { audioFilePath: string
       hasPlayedOnceRef.current = false
       clearPlaybackStartingState()
     }
-  }, [audioFilePath, isTauriEnvironment])
+  }, [audioFilePath, isTauriEnvironment, refreshSeed])
 
   return {
     artworkUrl: info.artworkDataUrl,

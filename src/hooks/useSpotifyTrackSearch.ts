@@ -14,7 +14,11 @@ const TRACK_ARTWORK_THEME_COLOR_FALLBACK = "#343434"
 
 type SpotifyTrackItem = {
   album?: {
-    images?: Array<{ url?: string }>
+    images?: Array<{
+      height?: number | null
+      url?: string
+      width?: number | null
+    }>
     name?: string
     release_date?: string
   }
@@ -26,6 +30,48 @@ type SpotifyTrackItem = {
 type TrackListItemComponentProps = ComponentProps<typeof TrackListItem>
 
 const artworkThemeColorCache = new Map<string, string>()
+
+const getSpotifyImagePixelSize = ({
+  height,
+  width
+}: {
+  height?: number | null
+  width?: number | null
+}) => {
+  const imageHeight = typeof height === "number" && height > 0 ? height : 0
+  const imageWidth = typeof width === "number" && width > 0 ? width : 0
+
+  return imageHeight * imageWidth
+}
+
+const getLargestSpotifyArtworkUrl = (
+  imageList:
+    | Array<{
+        height?: number | null
+        url?: string
+        width?: number | null
+      }>
+    | undefined
+) => {
+  if (!isValidArray(imageList)) {
+    return undefined
+  }
+
+  const validImageList = imageList.filter(image => isValidString(image.url))
+
+  if (!isValidArray(validImageList)) {
+    return undefined
+  }
+
+  const largestImage = validImageList.reduce((currentLargestImage, image) => {
+    const currentLargestImagePixelSize = getSpotifyImagePixelSize(currentLargestImage)
+    const imagePixelSize = getSpotifyImagePixelSize(image)
+
+    return imagePixelSize > currentLargestImagePixelSize ? image : currentLargestImage
+  })
+
+  return largestImage.url
+}
 
 const waitForMilliseconds = (milliseconds: number): Promise<void> => {
   return new Promise(resolve => {
@@ -59,7 +105,7 @@ const getTrackArtworkThemeColor = async (artworkUrl: string): Promise<string> =>
 const toTrackListItem = async (
   spotifyTrack: SpotifyTrackItem
 ): Promise<TrackListItemComponentProps | undefined> => {
-  const artworkUrl = spotifyTrack.album?.images?.find(image => isValidString(image.url))?.url
+  const artworkUrl = getLargestSpotifyArtworkUrl(spotifyTrack.album?.images)
 
   if (!isValidString(artworkUrl)) {
     return undefined

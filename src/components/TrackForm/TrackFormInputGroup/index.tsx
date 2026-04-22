@@ -1,3 +1,4 @@
+import { invoke, isTauri } from "@tauri-apps/api/core"
 import { useState } from "react"
 
 import {
@@ -7,7 +8,7 @@ import {
 import styles from "@/components/TrackForm/TrackFormInputGroup/index.module.css"
 import { TrackFormInputGroupItem } from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupItem"
 import { TrackFormInputGroupSaveIcon } from "@/components/TrackForm/TrackFormInputGroup/TrackFormInputGroupSaveIcon"
-import { isDefined } from "@/utils"
+import { isDefined, isValidString } from "@/utils"
 
 import type { ArtistSeparatorRadioValue } from "@/components/TrackForm/index.helpers"
 import type { TrackFormAudioFileTagInfo } from "@/hooks/useTrackFormAudioFile"
@@ -18,17 +19,24 @@ const EMPTY_RADIO_OPTION = {
 }
 
 type Props = {
+  audioFilePath: string | undefined
   artistSeparatorRadioValue: ArtistSeparatorRadioValue
+  flashArtworkUrl: string | undefined
   initialValue: TrackFormAudioFileTagInfo
   onArtistSeparatorRadioValueChange: (value: ArtistSeparatorRadioValue) => void
+  onFlashComplete: () => void
 }
 
 export const TrackFormInputGroup = ({
+  audioFilePath,
   artistSeparatorRadioValue,
+  flashArtworkUrl,
   initialValue,
-  onArtistSeparatorRadioValueChange
+  onArtistSeparatorRadioValueChange,
+  onFlashComplete
 }: Props) => {
   const [formValue, setFormValue] = useState(initialValue)
+  const [isFlashing, setIsFlashing] = useState(false)
 
   const handleInput = (key: keyof TrackFormAudioFileTagInfo) => (value: string) => {
     setFormValue(current => ({
@@ -59,6 +67,32 @@ export const TrackFormInputGroup = ({
 
     onArtistSeparatorRadioValueChange(nextArtistSeparatorRadioValue)
   }
+
+  const handleFlashButtonClick = async () => {
+    if (isFlashing || !isTauri() || !isValidString(audioFilePath)) {
+      return
+    }
+
+    setIsFlashing(true)
+
+    try {
+      await invoke("write_audio_file_tag_info", {
+        filePath: audioFilePath,
+        tagInfo: {
+          ...formValue,
+          artworkUrl: flashArtworkUrl
+        }
+      })
+
+      onFlashComplete()
+    } catch {
+      alert("音源ファイルへのタグ書き込みに失敗しました")
+    } finally {
+      setIsFlashing(false)
+    }
+  }
+
+  const isFlashButtonDisabled = isFlashing || !isValidString(audioFilePath)
 
   return (
     <div className={styles.trackFormInputGroup}>
@@ -105,7 +139,12 @@ export const TrackFormInputGroup = ({
         />
       </div>
 
-      <button className={styles.flashButton} type="button">
+      <button
+        className={styles.flashButton}
+        disabled={isFlashButtonDisabled}
+        onClick={handleFlashButtonClick}
+        type="button"
+      >
         <span className={styles.text}>Flash!</span>
         <span className={styles.icon}>
           <TrackFormInputGroupSaveIcon />

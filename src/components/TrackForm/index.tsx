@@ -6,13 +6,16 @@ import type { ComponentProps } from "react"
 
 type Props = Pick<
   ComponentProps<typeof TrackFormInputGroup>,
-  "artistSeparatorRadioValue" | "onArtistSeparatorRadioValueChange"
+  | "artistSeparatorRadioValue"
+  | "audioFilePath"
+  | "flashArtworkUrl"
+  | "onArtistSeparatorRadioValueChange"
+  | "onFlashComplete"
 > &
   Pick<
     ComponentProps<typeof TrackFormMetaInfo>,
     "info" | "isPlaybackStarting" | "isPlaying" | "onPlayButtonClick"
   > & {
-    audioFilePath: string | undefined
     tagInfo: ComponentProps<typeof TrackFormInputGroup>["initialValue"]
     inputGroupResetSeed: number
   }
@@ -20,12 +23,14 @@ type Props = Pick<
 export const TrackForm = ({
   audioFilePath,
   artistSeparatorRadioValue,
+  flashArtworkUrl,
   info,
   tagInfo,
   inputGroupResetSeed,
   isPlaying,
   isPlaybackStarting,
   onArtistSeparatorRadioValueChange,
+  onFlashComplete,
   onPlayButtonClick
 }: Props) => {
   const inputGroupResetKey = [
@@ -51,8 +56,11 @@ export const TrackForm = ({
         <TrackFormInputGroup
           key={inputGroupResetKey}
           artistSeparatorRadioValue={artistSeparatorRadioValue}
+          audioFilePath={audioFilePath}
+          flashArtworkUrl={flashArtworkUrl}
           initialValue={tagInfo}
           onArtistSeparatorRadioValueChange={onArtistSeparatorRadioValueChange}
+          onFlashComplete={onFlashComplete}
         />
       </div>
     </div>
