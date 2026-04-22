@@ -22,6 +22,7 @@ const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
   const [audioFilePath, setAudioFilePath] = useState<string | undefined>()
   const [trackFormAudioFileRefreshSeed, setTrackFormAudioFileRefreshSeed] = useState(0)
+  const [trackListResetSeed, setTrackListResetSeed] = useState(0)
   const [selectedTrackTagInfo, setSelectedTrackTagInfo] = useState<
     | (ComponentProps<typeof TrackForm>["tagInfo"] & {
         artworkUrl: string
@@ -35,6 +36,7 @@ const App = () => {
   const handleMp3Drop = (nextAudioFilePath: string) => {
     setAudioFilePath(nextAudioFilePath)
     setSelectedTrackTagInfo(undefined)
+    setTrackListResetSeed(current => current + 1)
     setTrackFormInputResetSeed(current => current + 1)
   }
 
@@ -107,6 +109,7 @@ const App = () => {
         <hr className={styles.divider} />
         <div className={styles.list}>
           <TrackList
+            key={trackListResetSeed}
             itemList={trackList}
             onItemClick={item => {
               setSelectedTrackTagInfo({
