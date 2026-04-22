@@ -2,7 +2,9 @@ import { useState } from "react"
 
 import styles from "@/App.module.css"
 import { ArtworkView } from "@/components/ArtworkView"
+import { DropOverlay } from "@/components/DropOverlay"
 import { KeywordInput } from "@/components/KeywordInput"
+import { Signin } from "@/components/Signin"
 import { TrackForm } from "@/components/TrackForm"
 import { TrackList } from "@/components/TrackList"
 import { UserInfoLabel } from "@/components/UserInfoLabel"
@@ -11,8 +13,6 @@ import { useSpotifyAuthSession } from "@/hooks/useSpotifyAuthSession"
 import { useSpotifyTrackSearch } from "@/hooks/useSpotifyTrackSearch"
 import { useTrackFormAudioFile } from "@/hooks/useTrackFormAudioFile"
 import { isValidString } from "@/utils"
-
-import { Signin } from "@/components/Signin"
 
 const App = () => {
   const [searchKeyword, setSearchKeyword] = useState("")
@@ -71,7 +71,11 @@ const App = () => {
           isPlaying={isPlaying}
           onPlayButtonClick={onPlayButtonClick}
         />
-        {isFileDragOver && <div className={styles.dropOverlay}>ドロップしてください</div>}
+        {isFileDragOver && (
+          <div className={styles.overlay}>
+            <DropOverlay />
+          </div>
+        )}
       </div>
     </main>
   )

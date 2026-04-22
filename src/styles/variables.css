@@ -1,6 +1,7 @@
 :root {
   --color-white: #fff;
   --color-black-alpha-10: rgb(0 0 0 / 10%);
+  --color-black-alpha-50: rgb(0 0 0 / 50%);
   --color-dark: #676767;
   --color-soft-dark: #828282;
   --color-gray: #b1b1b1;
