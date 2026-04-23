@@ -36,7 +36,7 @@ export const TrackFormInputGroup = ({
   onArtistSeparatorRadioValueChange,
   onFlashComplete
 }: Props) => {
-  const flashCompletedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const flashCompletedResetTimerRef = useRef<number | undefined>(undefined)
   const [formValue, setFormValue] = useState(initialValue)
   const [isFlashCompleted, setIsFlashCompleted] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)

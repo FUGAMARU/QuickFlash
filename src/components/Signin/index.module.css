@@ -3,7 +3,7 @@
   place-items: center;
   width: 100vw;
   height: 100vh;
-  background-image: url("/info-bg.svg");
+  background-image: url("/abstract-bg.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -19,15 +19,14 @@
     > .brand {
       display: flex;
       gap: 12px;
-      align-items: flex-end;
+      align-items: center;
 
       > .icon {
-        width: 56px;
-        height: 56px;
+        width: 70px;
+        height: 70px;
       }
 
       > .text {
-        padding-bottom: 8px;
         font-family: Gabarito, sans-serif;
         font-size: 48px;
         font-weight: 700;
@@ -37,7 +36,7 @@
 
     > .divider {
       width: 100%;
-      margin-block: 16px;
+      margin-block: 8px 16px;
       border-top: 1px dotted var(--color-gray);
     }
 

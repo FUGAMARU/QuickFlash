@@ -18,10 +18,6 @@
       }
     ],
     "security": {
-      "assetProtocol": {
-        "enable": true,
-        "scope": ["$DOWNLOAD/Lovesick.mp3"]
-      },
       "csp": null
     }
   },

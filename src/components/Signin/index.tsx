@@ -11,10 +11,7 @@ export const Signin = ({ isLoading, onSignInButtonClick }: Props) => {
     <main className={styles.signIn}>
       <div className={styles.card}>
         <div className={styles.brand}>
-          <img
-            className={styles.icon}
-            src="https://alexdunn.org/wp-content/uploads/2020/01/empty_app_icon_512.png"
-          />
+          <img className={styles.icon} src="/app-icon.png" />
           <span className={styles.text}>QuickFlash</span>
         </div>
 

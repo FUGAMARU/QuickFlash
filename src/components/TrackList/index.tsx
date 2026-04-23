@@ -15,7 +15,7 @@ type Props = {
 }
 
 export const TrackList = ({ itemList, onItemClick }: Props) => {
-  const hoverDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const hoverDebounceTimerRef = useRef<number | undefined>(undefined)
   const initialPlacementFrameRef = useRef<number | undefined>(undefined)
   const itemWrapperRefList = useRef<Array<HTMLDivElement | null>>([])
   const [hoveredBgPosition, setHoveredBgPosition] = useState<

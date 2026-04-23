@@ -3,7 +3,8 @@
   flex: 1;
   place-items: center;
   min-height: 0;
-  background-image: linear-gradient(rgb(20 24 32 / 3%), rgb(20 24 32 / 3%)), url("/info-bg.svg");
+  background-image:
+    linear-gradient(rgb(20 24 32 / 3%), rgb(20 24 32 / 3%)), url("/abstract-bg.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
