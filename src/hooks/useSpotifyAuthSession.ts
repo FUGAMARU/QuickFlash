@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core"
+import { invoke, isTauri } from "@tauri-apps/api/core"
 import { open } from "@tauri-apps/plugin-shell"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
@@ -15,6 +15,8 @@ const SPOTIFY_CURRENT_USER_PROFILE_API_URL = "https://api.spotify.com/v1/me"
 const SPOTIFY_AUTH_POLL_INTERVAL_MS = 1000
 const SPOTIFY_AUTH_POLL_MAX_ATTEMPTS = 60
 const SPOTIFY_ACCESS_TOKEN_REFRESH_BUFFER_SECONDS = 120
+const BROWSER_BYPASS_ACCESS_TOKEN = "browser-bypass-auth"
+const BROWSER_BYPASS_EMAIL_ADDRESS = "Browser Preview"
 
 type SpotifyAuthSession = {
   accessToken: string
@@ -160,6 +162,7 @@ export const useSpotifyAuthSession = () => {
   const [userEmailAddress, setUserEmailAddress] = useState<string | undefined>()
   const [authInProgress, setAuthInProgress] = useState(false)
   const [isAuthBootstrapInProgress, setAuthBootstrapInProgress] = useState(true)
+  const isRunningInTauri = isTauri()
 
   const clearAuthSession = useCallback(async () => {
     setAccessToken(undefined)
@@ -168,12 +171,16 @@ export const useSpotifyAuthSession = () => {
     setUserEmailAddress(undefined)
     removeStoredSpotifyAuthSession()
 
+    if (!isRunningInTauri) {
+      return
+    }
+
     try {
       await invoke("clear_auth_session")
     } catch {
       // backend側のセッション削除失敗時も、UIはサインアウト済み状態を優先する
     }
-  }, [removeStoredSpotifyAuthSession])
+  }, [isRunningInTauri, removeStoredSpotifyAuthSession])
 
   const onSignoutButtonClick = useCallback(() => {
     clearAuthSession()
@@ -209,6 +216,10 @@ export const useSpotifyAuthSession = () => {
 
     const bootstrapAuthSession = async () => {
       try {
+        if (!isRunningInTauri) {
+          return
+        }
+
         let bootstrapSession = storedAuthSessionAtLaunch
 
         if (!isDefined(bootstrapSession)) {
@@ -248,7 +259,7 @@ export const useSpotifyAuthSession = () => {
     return () => {
       isDisposed = true
     }
-  }, [applyAuthSession, refreshSpotifyAccessToken, storedAuthSessionAtLaunch])
+  }, [applyAuthSession, isRunningInTauri, refreshSpotifyAccessToken, storedAuthSessionAtLaunch])
 
   useEffect(() => {
     if (!isValidString(refreshToken) || !isDefined(accessTokenExpiresAtEpochSeconds)) {
@@ -276,6 +287,14 @@ export const useSpotifyAuthSession = () => {
   const startSpotifyAuth = useCallback(async () => {
     try {
       setAuthInProgress(true)
+
+      if (!isRunningInTauri) {
+        setAccessToken(BROWSER_BYPASS_ACCESS_TOKEN)
+        setRefreshToken(undefined)
+        setAccessTokenExpiresAtEpochSeconds(undefined)
+        setUserEmailAddress(BROWSER_BYPASS_EMAIL_ADDRESS)
+        return
+      }
 
       const authData = await invoke<{ codeChallenge: string }>("start_spotify_auth", {
         clientId: SPOTIFY_PKCE_CLIENT_ID
@@ -305,7 +324,7 @@ export const useSpotifyAuthSession = () => {
     } finally {
       setAuthInProgress(false)
     }
-  }, [applyAuthSession, clearAuthSession])
+  }, [applyAuthSession, clearAuthSession, isRunningInTauri])
 
   return useMemo(
     () => ({
