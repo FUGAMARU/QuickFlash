@@ -1,7 +1,9 @@
 {
   "name": "quickflash",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Easily import metadata from Spotify into MP3 files.",
+  "author": "FUGAMARU",
   "type": "module",
   "scripts": {
     "dev": "vite",

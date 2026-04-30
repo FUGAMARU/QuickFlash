@@ -1,8 +1,8 @@
 [package]
-name = "quickflash"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "QuickFlash"
+version = "1.0.0"
+description = "Easily import metadata from Spotify into MP3 files."
+authors = ["FUGAMARU"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
