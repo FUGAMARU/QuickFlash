@@ -1,7 +1,11 @@
-# Tauri + React + Typescript
+# QuickFlash
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+QuickFlash is a simple app for copying metadata from Spotify to MP3 files.
 
-## Recommended IDE Setup
+Drop an MP3 file, choose the matching track from Spotify search results, and flash the metadata into the file.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## How to Use
+
+1. Drag and drop an MP3 file into QuickFlash.
+2. Search Spotify for the track you want to use as the metadata source, then select it from the sidebar.
+3. Press the `Flash!` button to write the metadata to the MP3 file.
