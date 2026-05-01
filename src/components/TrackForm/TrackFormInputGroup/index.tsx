@@ -61,7 +61,7 @@ export const TrackFormInputGroup = ({
     }
   }, [])
 
-  const handleInput = (key: keyof TrackFormAudioFileTagInfo) => (value: string) => {
+  const handleInput = (key: keyof TrackFormAudioFileTagInfo, value: string) => {
     resetFlashCompleted()
 
     setFormValue(current => ({
@@ -132,13 +132,13 @@ export const TrackFormInputGroup = ({
       <div className={styles.primary}>
         <TrackFormInputGroupItem
           label="タイトル"
-          onInput={handleInput("title")}
+          onInput={value => handleInput("title", value)}
           radioOption={EMPTY_RADIO_OPTION}
           value={formValue.title}
         />
         <TrackFormInputGroupItem
           label="アーティスト"
-          onInput={handleInput("artist")}
+          onInput={value => handleInput("artist", value)}
           onRadioValueChange={handleArtistSeparatorRadioValueChange}
           radioOption={ARTIST_SEPARATOR_RADIO_OPTION}
           radioValue={artistSeparatorRadioValue}
@@ -146,7 +146,7 @@ export const TrackFormInputGroup = ({
         />
         <TrackFormInputGroupItem
           label="アルバム"
-          onInput={handleInput("album")}
+          onInput={value => handleInput("album", value)}
           radioOption={EMPTY_RADIO_OPTION}
           value={formValue.album}
         />
@@ -154,19 +154,19 @@ export const TrackFormInputGroup = ({
       <div className={styles.secondary}>
         <TrackFormInputGroupItem
           label="ジャンル"
-          onInput={handleInput("genre")}
+          onInput={value => handleInput("genre", value)}
           radioOption={EMPTY_RADIO_OPTION}
           value={formValue.genre}
         />
         <TrackFormInputGroupItem
           label="リリース"
-          onInput={handleInput("release")}
+          onInput={value => handleInput("release", value)}
           radioOption={EMPTY_RADIO_OPTION}
           value={formValue.release}
         />
         <TrackFormInputGroupItem
           label="トラックナンバー"
-          onInput={handleInput("trackNumber")}
+          onInput={value => handleInput("trackNumber", value)}
           radioOption={EMPTY_RADIO_OPTION}
           value={formValue.trackNumber}
         />

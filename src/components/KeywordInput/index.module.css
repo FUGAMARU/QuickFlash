@@ -17,7 +17,7 @@
     width: 18px;
     height: 18px;
     color: var(--color-gray);
-    animation: keywordInputSpin 0.8s linear infinite;
+    animation: keyword-input-spin 0.8s linear infinite;
   }
 
   > .input {
@@ -30,7 +30,7 @@
   }
 }
 
-@keyframes keywordInputSpin {
+@keyframes keyword-input-spin {
   to {
     transform: rotate(360deg);
   }
