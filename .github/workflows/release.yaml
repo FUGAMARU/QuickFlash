@@ -169,25 +169,25 @@ jobs:
         run: |
           mkdir -p release-assets
           bundle_dir="${{ matrix.bundle_dir }}"
-          mapfile -t files < <(
-            find "$bundle_dir" -type f \(
-              -name '*.msi' -o \
-              -name '*.exe' -o \
-              -name '*.zip' -o \
-              -name '*.dmg' -o \
-              -name '*.app.tar.gz' -o \
-              -name '*.sig' \
-            \)
-          )
+          files_list="$RUNNER_TEMP/release-files.txt"
 
-          if [[ ${#files[@]} -eq 0 ]]; then
+          find "$bundle_dir" -type f \(
+            -name '*.msi' -o \
+            -name '*.exe' -o \
+            -name '*.zip' -o \
+            -name '*.dmg' -o \
+            -name '*.app.tar.gz' -o \
+            -name '*.sig' \
+          \) > "$files_list"
+
+          if [[ ! -s "$files_list" ]]; then
             echo "No release assets were produced for ${{ matrix.label }}." >&2
             exit 1
           fi
 
-          for file in "${files[@]}"; do
+          while IFS= read -r file; do
             cp "$file" release-assets/
-          done
+          done < "$files_list"
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
