@@ -184,7 +184,7 @@ jobs:
         run: npm ci
 
       - name: Build app and upload release assets
-        uses: softprops/action-gh-release@v2
+        uses: tauri-apps/tauri-action@action-v0.6.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
