@@ -130,10 +130,12 @@ jobs:
           - label: Windows x64
             os: windows-latest
             target: x86_64-pc-windows-msvc
+            bundle_dir: src-tauri/target/release/bundle
             args: ""
           - label: macOS Apple Silicon
             os: macos-latest
             target: aarch64-apple-darwin
+            bundle_dir: src-tauri/target/aarch64-apple-darwin/release/bundle
             args: --target aarch64-apple-darwin --no-sign
     env:
       VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
@@ -166,14 +168,16 @@ jobs:
         shell: bash
         run: |
           mkdir -p release-assets
-          shopt -s nullglob globstar
-          files=(
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.zip
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.app.tar.gz
-            src-tauri/target/${{ matrix.target }}/release/bundle/**/*.sig
+          bundle_dir="${{ matrix.bundle_dir }}"
+          mapfile -t files < <(
+            find "$bundle_dir" -type f \(
+              -name '*.msi' -o \
+              -name '*.exe' -o \
+              -name '*.zip' -o \
+              -name '*.dmg' -o \
+              -name '*.app.tar.gz' -o \
+              -name '*.sig' \
+            \)
           )
 
           if [[ ${#files[@]} -eq 0 ]]; then
