@@ -119,6 +119,31 @@ jobs:
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
+      - name: Create tag
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: ${{ steps.normalize_version.outputs.release_tag }}
+        with:
+          script: |
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${process.env.RELEASE_TAG}`,
+              sha: context.sha
+            });
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.normalize_version.outputs.release_tag }}
+          name: ${{ steps.normalize_version.outputs.release_name }}
+          body: ${{ steps.release_body.outputs.release_body }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+
   build:
     name: Build ${{ matrix.label }}
     needs: prepare
@@ -130,12 +155,10 @@ jobs:
           - label: Windows x64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            bundle_dir: src-tauri/target/release/bundle
             args: ""
           - label: macOS Apple Silicon
             os: macos-latest
             target: aarch64-apple-darwin
-            bundle_dir: src-tauri/target/aarch64-apple-darwin/release/bundle
             args: --target aarch64-apple-darwin --no-sign
     env:
       VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
@@ -160,78 +183,16 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build app bundles
-        shell: bash
-        run: npm run tauri build -- ${{ matrix.args }}
-
-      - name: Collect release assets
-        shell: bash
-        run: |
-          mkdir -p release-assets
-          bundle_dir="${{ matrix.bundle_dir }}"
-          files_list="$RUNNER_TEMP/release-files.txt"
-
-          find "$bundle_dir" -type f \(
-            -name '*.msi' -o \
-            -name '*.exe' -o \
-            -name '*.zip' -o \
-            -name '*.dmg' -o \
-            -name '*.app.tar.gz' -o \
-            -name '*.sig' \
-          \) > "$files_list"
-
-          if [[ ! -s "$files_list" ]]; then
-            echo "No release assets were produced for ${{ matrix.label }}." >&2
-            exit 1
-          fi
-
-          while IFS= read -r file; do
-            cp "$file" release-assets/
-          done < "$files_list"
-
-      - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.target }}-release-assets
-          path: release-assets/*
-          if-no-files-found: error
-
-  release:
-    name: Publish release
-    needs:
-      - prepare
-      - build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download built assets
-        uses: actions/download-artifact@v4
-        with:
-          path: release-assets
-          merge-multiple: true
-
-      - name: Create tag
-        uses: actions/github-script@v7
-        env:
-          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
-        with:
-          script: |
-            await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/tags/${process.env.RELEASE_TAG}`,
-              sha: context.sha
-            });
-
-      - name: Create release after build completion
+      - name: Build app and upload release assets
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
         with:
-          tag_name: ${{ needs.prepare.outputs.release_tag }}
-          name: ${{ needs.prepare.outputs.release_name }}
-          body: ${{ needs.prepare.outputs.release_body }}
-          generate_release_notes: true
-          draft: false
+          tagName: ${{ needs.prepare.outputs.release_tag }}
+          releaseName: ${{ needs.prepare.outputs.release_name }}
+          releaseBody: ${{ needs.prepare.outputs.release_body }}
+          generateReleaseNotes: true
+          releaseDraft: false
           prerelease: false
-          files: |
-            release-assets/*
+          args: ${{ matrix.args }}
