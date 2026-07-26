@@ -9,7 +9,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.workflow }}-${{ github.event.inputs.version }}
@@ -19,11 +19,10 @@ jobs:
   prepare:
     name: Prepare release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       release_tag: ${{ steps.normalize_version.outputs.release_tag }}
-      release_version: ${{ steps.normalize_version.outputs.release_version }}
-      release_name: ${{ steps.normalize_version.outputs.release_name }}
-      release_body: ${{ steps.release_body.outputs.release_body }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -148,6 +147,8 @@ jobs:
     name: Build ${{ matrix.label }}
     needs: prepare
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -190,9 +191,5 @@ jobs:
           VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
         with:
           tagName: ${{ needs.prepare.outputs.release_tag }}
-          releaseName: ${{ needs.prepare.outputs.release_name }}
-          releaseBody: ${{ needs.prepare.outputs.release_body }}
-          generateReleaseNotes: true
           releaseDraft: false
-          prerelease: false
           args: ${{ matrix.args }}
